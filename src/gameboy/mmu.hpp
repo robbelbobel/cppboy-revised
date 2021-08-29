@@ -3,9 +3,12 @@
 
 #include <stdint.h>
 
+#include "cartridge.hpp"
+
 class MMU{
     private:
-        ;
+        // Private Class Pointers
+        Cartridge* cartridge;
 
     public:
         // Public Class Functions

@@ -33,3 +33,7 @@ bool Cartridge::loadFile(char* path){
 
     return true;
 }
+
+uint8_t Cartridge::read(const uint16_t &address){
+    return Cartridge::data[address];
+}

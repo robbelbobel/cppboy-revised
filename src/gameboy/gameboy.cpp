@@ -1,19 +1,19 @@
 #include "gameboy.hpp"
 
 Gameboy::Gameboy(){
-    // Assign Private Class Pointers
     Gameboy::cartridge = new Cartridge;
     Gameboy::mmu = new MMU;
     Gameboy::cpu = new CPU(Gameboy::mmu);
 }
 
 Gameboy::~Gameboy(){
-    // Delete All Dynamically Allocated Variables
     delete Gameboy::cpu;
+    delete Gameboy::mmu;
+    delete Gameboy::cartridge;
 }
 
 void Gameboy::step(){
-    
+    Gameboy::cpu -> step();
 }
 
 bool Gameboy::loadFile(char* path){

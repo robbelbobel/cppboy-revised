@@ -23,7 +23,7 @@ class CPU{
 
     public:
         // Public Class Functions
-        CPU(MMU* MMU);
+        CPU(MMU* mmu);
         ~CPU();
         
         void reset();
