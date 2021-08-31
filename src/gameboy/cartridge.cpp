@@ -1,7 +1,9 @@
 #include "cartridge.hpp"
 
 Cartridge::Cartridge(){
-
+    // for(uint16_t i = 0; i < 0x8000; i++){
+    //     Cartridge::data[i] = 0;
+    // }
 }
 
 Cartridge::~Cartridge(){
@@ -27,7 +29,7 @@ bool Cartridge::loadFile(char* path){
     int begin = gameStream.tellg();
 
     // Read File
-    gameStream.read((char*) Cartridge::data, end - begin);
+    gameStream.read(Cartridge::data, end - begin);
 
     gameStream.close();
 

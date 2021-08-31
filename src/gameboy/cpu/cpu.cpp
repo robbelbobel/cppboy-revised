@@ -26,8 +26,18 @@ void CPU::reset(){
 
     CPU::PC = 0x0100;
     CPU::SP = 0xFFFE;
+
+    // Reset Class Variables
+    CPU::cycleCount = 0;
 }
 
 void CPU::step(){
+    // Execute Instruction If Cycle Count Is 0
+    if(CPU::cycleCount == 0){
+        CPU::execute(CPU::mmu -> read(CPU::PC));
+        std::cout << "PC: " << std::hex << (int) CPU::PC << std::endl;
+    }
 
+    // Decrement Cycle Count
+    CPU::cycleCount--;
 }

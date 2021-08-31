@@ -1,7 +1,7 @@
 #include "mmu.hpp"
 
-MMU::MMU(){
-    ;
+MMU::MMU(Cartridge* cartridge){
+    MMU::cartridge = cartridge;
 }
 
 MMU::~MMU(){

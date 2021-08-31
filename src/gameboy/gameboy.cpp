@@ -2,7 +2,7 @@
 
 Gameboy::Gameboy(){
     Gameboy::cartridge = new Cartridge;
-    Gameboy::mmu = new MMU;
+    Gameboy::mmu = new MMU(Gameboy::cartridge);
     Gameboy::cpu = new CPU(Gameboy::mmu);
 }
 

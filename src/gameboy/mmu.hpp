@@ -12,7 +12,7 @@ class MMU{
 
     public:
         // Public Class Functions
-        MMU();
+        MMU(Cartridge* cartridge);
         ~MMU();
 
         uint8_t read(const uint16_t &address);

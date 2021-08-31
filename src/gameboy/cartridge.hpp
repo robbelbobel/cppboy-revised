@@ -2,10 +2,12 @@
 #define CARTRIDGE_HPP
 
 #include <fstream>
+#include <iostream>
 
 class Cartridge{
     private:
-        uint8_t data[0x8000];
+        // Private Class Variables
+        char data[0x8000];
     
     public:
         // Public Class Functions
@@ -13,6 +15,7 @@ class Cartridge{
         ~Cartridge();
 
         bool loadFile(char* path);
+        
         uint8_t read(const uint16_t &address);
 };
 
