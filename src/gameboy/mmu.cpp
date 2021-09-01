@@ -61,7 +61,6 @@ MMU::MMU(PPU* ppu, Cartridge* cartridge){
     MMU::write(0xFF6B, 0xFF);   // OCPD
     MMU::write(0xFF70, 0xFF);   // SVBK
     MMU::write(0xFFFF, 0x00);   // IE
-
 }
 
 MMU::~MMU(){
@@ -481,7 +480,7 @@ uint8_t MMU::read(const uint16_t &address){
     }
     // VRAM
     if(address >= 0x8000 && address < 0xA000){
-        ;
+        return MMU::ppu -> vRAM[address - 0x8000];
     }
     // Ext. RAM
     if(address >= 0xA000 && address < 0xC000){
@@ -489,23 +488,23 @@ uint8_t MMU::read(const uint16_t &address){
     }
     // WRAM
     if(address >= 0xC000 && address < 0xE000){
-        ;
+        return MMU::wRAM[address - 0xC000];
     }
     // OAM
     if(address >= 0xFE00 && address < 0xFEA0){
-        ;
+        return MMU::ppu -> oam[address - 0xFE00];
     }
     // IO Regs
     if(address >= 0xFF00 && address < 0xFF80){
-        ;
+        return MMU::ioRead(address);
     }
     // HRAM
     if(address >= 0xFF80 && address < 0xFFFF){
-        ;
+        return MMU::hRAM[address - 0xFF80];
     }
     // IE
     if(address == 0xFFFF){
-        ;
+        return MMU::IE;
     }
 
     return 0xFF;
@@ -514,7 +513,7 @@ uint8_t MMU::read(const uint16_t &address){
 void MMU::write(const uint16_t &address, const uint8_t &value){
     // VRAM
     if(address >= 0x8000 && address < 0xA000){
-        ;
+        MMU::ppu -> vRAM[address] = value;
     }
     // Ext. RAM
     if(address >= 0xA000 && address < 0xC000){
@@ -522,22 +521,22 @@ void MMU::write(const uint16_t &address, const uint8_t &value){
     }
     // WRAM
     if(address >= 0xC000 && address < 0xE000){
-        ;
+        MMU::wRAM[address] = value;
     }
     // OAM
     if(address >= 0xFE00 && address < 0xFEA0){
-        ;
+        MMU::ppu -> oam[address - 0xFE00] = value;
     }
     // IO Regs
     if(address >= 0xFF00 && address < 0xFF80){
-        ;
+        MMU::ioWrite(address, value);
     }
     // HRAM
     if(address >= 0xFF80 && address < 0xFFFF){
-        ;
+        MMU::hRAM[address - 0xFF80] = value;
     }
     // IE
     if(address == 0xFFFF){
-        ;
+        MMU::IE = value;
     }
 }

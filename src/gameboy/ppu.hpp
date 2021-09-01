@@ -10,6 +10,9 @@ public:
     ~PPU();
 
     // Public Class Variables
+    // Memory Arrays
+    uint8_t vRAM[0x2000];
+    uint8_t oam[0xA0];
     // LCD Control Register (LCDC)
     bool ppuEnable;
     bool winTMArea;

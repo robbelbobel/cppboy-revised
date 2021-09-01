@@ -8,10 +8,16 @@
 
 class MMU{
     private:
-        // Private Class Pointers
+        // Private Class Variables
         PPU* ppu;
         Cartridge* cartridge;
+        // Memory Arrays
+        uint8_t wRAM[0x2000];
+        uint8_t hRAM[0x80];
+        
+        uint8_t IE;
 
+        // Private Class Functions
         uint8_t ioRead(const uint16_t &address);
         void ioWrite(const uint16_t &address, const uint8_t &value);
 
