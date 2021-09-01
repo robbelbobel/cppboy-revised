@@ -1,8 +1,67 @@
 #include "mmu.hpp"
 
 MMU::MMU(PPU* ppu, Cartridge* cartridge){
+    // Assign Private Class Pointers
     MMU::ppu        = ppu;
     MMU::cartridge  = cartridge;
+
+    // Initialize IO Registers
+    MMU::write(0xFF00, 0xCF);   // JOYP
+    MMU::write(0xFF01, 0x00);   // SB
+    MMU::write(0xFF02, 0x7E);   // SC
+    MMU::write(0xFF04, 0x18);   // DIV
+    MMU::write(0xFF05, 0x00);   // TIMA
+    MMU::write(0xFF06, 0x00);   // TMA
+    MMU::write(0xFF07, 0xF8);   // TAC
+    MMU::write(0xFF0F, 0xE1);   // IF
+    MMU::write(0xFF10, 0x80);   // NR10
+    MMU::write(0xFF11, 0xBF);   // NR11
+    MMU::write(0xFF12, 0xF3);   // NR12
+    MMU::write(0xFF13, 0xFF);   // NR13
+    MMU::write(0xFF14, 0xBF);   // NR14
+    MMU::write(0xFF16, 0x3F);   // NR21
+    MMU::write(0xFF17, 0x00);   // NR22
+    MMU::write(0xFF18, 0xFF);   // NR23
+    MMU::write(0xFF19, 0xBF);   // NR24
+    MMU::write(0xFF1A, 0x7F);   // NR30
+    MMU::write(0xFF1B, 0xFF);   // NR31
+    MMU::write(0xFF1C, 0x9F);   // NR32
+    MMU::write(0xFF1D, 0xFF);   // NR33
+    MMU::write(0xFF1E, 0xBF);   // NR34
+    MMU::write(0xFF20, 0xFF);   // NR41
+    MMU::write(0xFF21, 0x00);   // NR42
+    MMU::write(0xFF22, 0x00);   // NR43
+    MMU::write(0xFF23, 0xBF);   // NR44
+    MMU::write(0xFF24, 0x77);   // NR50
+    MMU::write(0xFF25, 0xF3);   // NR51
+    MMU::write(0xFF26, 0xF1);   // NR52
+    MMU::write(0xFF40, 0x91);   // LCDC
+    MMU::write(0xFF41, 0x81);   // STAT
+    MMU::write(0xFF42, 0x00);   // SCY
+    MMU::write(0xFF43, 0x00);   // SCX
+    MMU::write(0xFF44, 0x91);   // LY
+    MMU::write(0xFF45, 0x00);   // LYC
+    MMU::write(0xFF46, 0xFF);   // DMA
+    MMU::write(0xFF47, 0xFC);   // BGP
+    MMU::write(0xFF48, 0xFF);   // OBP0
+    MMU::write(0xFF49, 0xFF);   // OBP1
+    MMU::write(0xFF4A, 0x00);   // WY
+    MMU::write(0xFF4B, 0x00);   // WX
+    MMU::write(0xFF4D, 0xFF);   // KEY1
+    MMU::write(0xFF4F, 0xFF);   // VBK
+    MMU::write(0xFF51, 0xFF);   // HDMA1
+    MMU::write(0xFF52, 0xFF);   // HDMA2
+    MMU::write(0xFF53, 0xFF);   // HDMA3
+    MMU::write(0xFF54, 0xFF);   // HDMA4
+    MMU::write(0xFF55, 0xFF);   // HDMA5
+    MMU::write(0xFF56, 0xFF);   // RP
+    MMU::write(0xFF68, 0xFF);   // BCPS
+    MMU::write(0xFF69, 0xFF);   // BCPD
+    MMU::write(0xFF6A, 0xFF);   // OCPS
+    MMU::write(0xFF6B, 0xFF);   // OCPD
+    MMU::write(0xFF70, 0xFF);   // SVBK
+    MMU::write(0xFFFF, 0x00);   // IE
+
 }
 
 MMU::~MMU(){
