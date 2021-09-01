@@ -9,6 +9,7 @@ add_executable(${PROJECT_NAME}  src/main.cpp
                                 src/gameboy/cartridge.cpp
                                 src/gameboy/gameboy.cpp
                                 src/gameboy/mmu.cpp
+                                src/gameboy/ppu.cpp
                                 src/gameboy/cpu/cpu.cpp
                                 src/gameboy/cpu/opcodes.cpp
                                 )

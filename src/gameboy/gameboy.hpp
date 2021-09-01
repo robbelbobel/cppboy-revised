@@ -5,7 +5,6 @@
 
 #include "mmu.hpp"
 #include "cpu/cpu.hpp"
-#include "cartridge.hpp"
 
 class Gameboy{
     private:
@@ -13,6 +12,7 @@ class Gameboy{
         Cartridge* cartridge;
         MMU* mmu;
         CPU* cpu;
+        PPU* ppu;
 
     public:
         // Public Functions

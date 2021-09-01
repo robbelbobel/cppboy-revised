@@ -1,9 +1,10 @@
 #include "gameboy.hpp"
 
 Gameboy::Gameboy(){
-    Gameboy::cartridge = new Cartridge;
-    Gameboy::mmu = new MMU(Gameboy::cartridge);
-    Gameboy::cpu = new CPU(Gameboy::mmu);
+    Gameboy::ppu        = new PPU;
+    Gameboy::cartridge  = new Cartridge;
+    Gameboy::mmu        = new MMU(Gameboy::ppu, Gameboy::cartridge);
+    Gameboy::cpu        = new CPU(Gameboy::mmu);
 }
 
 Gameboy::~Gameboy(){
