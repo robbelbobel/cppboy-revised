@@ -13,7 +13,7 @@ PPU::~PPU(){
 
 }
 
-void PPU::render(sf::RenderWindow &window){
+void PPU::draw(sf::RenderWindow &window){
     // Clear Window
     window.clear(sf::Color(0, 0, 0, 255));
 
@@ -30,7 +30,7 @@ void PPU::render(sf::RenderWindow &window){
     for(unsigned int y = 0; y < 144; y++){
         for(unsigned int x = 0; x < 160; x++){
             pixelShape.setPosition(sf::Vector2f(x * pxSize, y * pxSize));
-            if(PPU::pixelArray[y][x] == 0){
+            if(PPU::pixelArray[y][x]){
                 pixelShape.setFillColor(sf::Color(0, 0, 0, 255));
             }else{
                 pixelShape.setFillColor(sf::Color(255, 255, 255, 255));
@@ -56,11 +56,10 @@ void PPU::hBlank(){
     }
 }
 
-void PPU::vBlank(sf::RenderWindow &window){
+void PPU::vBlank(){
     if(PPU::cycleCount == 0){
         PPU::vBlankInt  = 1;
         PPU::cycleCount = 4560;
-        PPU::render(window);
     }
 
     PPU::cycleCount--;
@@ -114,11 +113,6 @@ void PPU::pixelTransfer(){
             uint8_t byte1 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2)];
             uint8_t byte2 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) + 1];
 
-            // uint8_t byte1 = PPU::vRAM[bgWinTDAddr + ((PPU::ly % 8) * 2)];
-            // uint8_t byte2 = PPU::vRAM[bgWinTDAddr + ((PPU::ly % 8) * 2) + 1];
-
-            std::cout << "Ly: " <<  (int) PPU::ly << ", i: " << (int) i << ", index: " << (int) index << ", byte1 addr: " << (int) bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) << ", byte2 addr: " << (int) bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) + 1 << std::endl;
-
             pixelArray[PPU::ly][(i * 8) + 0] = (((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1);
             pixelArray[PPU::ly][(i * 8) + 1] = (((byte2 >> 6) & 0b1) << 1) + ((byte1 >> 6) & 0b1);
             pixelArray[PPU::ly][(i * 8) + 2] = (((byte2 >> 5) & 0b1) << 1) + ((byte1 >> 5) & 0b1);
@@ -137,7 +131,7 @@ void PPU::pixelTransfer(){
     }
 }
 
-void PPU::step(sf::RenderWindow &window){
+void PPU::step(){
     if(!PPU::ppuEnable){
         return;
     }
@@ -148,7 +142,7 @@ void PPU::step(sf::RenderWindow &window){
             break;
         
         case PPU_VBLANK:
-            PPU::vBlank(window);
+            PPU::vBlank();
             break;
         
         case PPU_OAM_SEARCH:

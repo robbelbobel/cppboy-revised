@@ -13,9 +13,13 @@ Gameboy::~Gameboy(){
     delete Gameboy::cartridge;
 }
 
-void Gameboy::step(sf::RenderWindow &window){
+void Gameboy::step(){
     Gameboy::cpu -> step();
-    Gameboy::ppu -> step(window);
+    Gameboy::ppu -> step();
+}
+
+void Gameboy::draw(sf::RenderWindow &window){
+    Gameboy::ppu -> draw(window);
 }
 
 bool Gameboy::loadFile(char* path){

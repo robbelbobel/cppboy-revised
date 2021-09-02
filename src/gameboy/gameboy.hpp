@@ -17,7 +17,8 @@ class Gameboy{
         Gameboy();
         ~Gameboy();
     
-        void step(sf::RenderWindow &window);
+        void step();
+        void draw(sf::RenderWindow &window);
         bool loadFile(char* path);
 };
 

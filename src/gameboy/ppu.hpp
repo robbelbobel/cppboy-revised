@@ -18,10 +18,8 @@ enum PPU_MODES{
 class PPU{
 private:
     // Private Class Functions
-    void render(sf::RenderWindow &window);
-
     void hBlank();
-    void vBlank(sf::RenderWindow &window);
+    void vBlank();
     void oamSearch();
     void pixelTransfer();
 
@@ -30,7 +28,8 @@ public:
     PPU();
     ~PPU();
 
-    void step(sf::RenderWindow &window);
+    void step();
+    void draw(sf::RenderWindow &window);
 
     // Public Class Variables
     uint16_t cycleCount;

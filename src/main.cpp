@@ -1,5 +1,8 @@
 #include "gameboy/gameboy.hpp"
 
+#define GAMEBOY_SPEED 4194304
+#define UPDATE_SPEED 60
+
 void getInput(sf::Window &window);
 
 int main(int argc, char** argv){
@@ -16,14 +19,40 @@ int main(int argc, char** argv){
         return -1;
     }
 
+    // SFML Clocks For Timing
+    sf::Clock stepClock;
+    sf::Clock updateClock;
+    sf::Clock timeClock;
+    stepClock.restart();
+    updateClock.restart();
+
+    uint64_t stepCount = 0;
+
     //-----MAIN LOOP-----
     while(window.isOpen()){
-        // Get User Input
-        getInput(window);
-
         // Step The Emulator
-        gameboy.step(window);
+        if(stepClock.getElapsedTime().asMicroseconds() >= (1000000 / GAMEBOY_SPEED)){
+            // Step Emulator
+            gameboy.step();
+            stepCount++;
+
+            // Restart Clock
+            stepClock.restart();
+        }
+
+        if(updateClock.getElapsedTime().asMilliseconds() >= (1000 / UPDATE_SPEED)){
+            // Get User Input
+            getInput(window);
+
+            // Draw Emulator
+            gameboy.draw(window);
+
+            // Restart Clock
+            updateClock.restart();
+        }
     }
+
+    std::cout << "stepcount: " << stepCount << std::endl;
 
     return 0;
 }

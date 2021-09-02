@@ -26,9 +26,6 @@ void CPU::checkInterrupts(){
         intFlag &= ~0b1;
         CPU::mmu -> write(0xFF0F, intFlag);
         CPU::INTCALL(0x40);
-
-        std::cout << "Vblank Interrupt occured! IE: " << (int) intEnable << std::endl;
-
         return;
     }
     if(((res >> 1) & 0b1) == 1){
@@ -71,7 +68,7 @@ void CPU::step(){
     // Execute Instruction If Cycle Count Is 0
     if(CPU::cycleCount == 0){
         CPU::execute(CPU::mmu -> read(CPU::PC));
-        std::cout << "PC: " << std::hex << (int) CPU::PC << ", LY: " << (int) CPU::mmu -> read(0xFF44) << ", IE: " << (int) CPU::mmu -> read(0xFFFF) << std::endl;
+        // std::cout << "PC: " << std::hex << (int) CPU::PC << ", LY: " << (int) CPU::mmu -> read(0xFF44) << ", IE: " << (int) CPU::mmu -> read(0xFFFF) << std::endl;
     }
 
     // Decrement Cycle Count
