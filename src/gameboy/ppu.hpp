@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+
 enum PPU_MODES{
     PPU_HBLANK,
     PPU_VBLANK,
@@ -13,8 +16,10 @@ enum PPU_MODES{
 class PPU{
 private:
     // Private Class Functions
+    void render(sf::RenderWindow &window);
+
     void hBlank();
-    void vBlank();
+    void vBlank(sf::RenderWindow &window);
     void oamSearch();
     void pixelTransfer();
 
@@ -23,10 +28,12 @@ public:
     PPU();
     ~PPU();
 
-    void step();
+    void step(sf::RenderWindow &window);
 
     // Public Class Variables
     uint16_t cycleCount;
+    uint8_t pxPtr;
+    uint8_t pixelArray[144][160];
     // Memory Arrays
     uint8_t vRAM[0x2000];
     uint8_t oam[0xA0];

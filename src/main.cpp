@@ -1,6 +1,3 @@
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-
 #include "gameboy/gameboy.hpp"
 
 void getInput(sf::Window &window);
@@ -22,10 +19,10 @@ int main(int argc, char** argv){
     //-----MAIN LOOP-----
     while(window.isOpen()){
         // Get User Input
-        // getInput(window);
+        getInput(window);
 
         // Step The Emulator
-        gameboy.step();
+        gameboy.step(window);
     }
 
     return 0;
