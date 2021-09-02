@@ -63,7 +63,7 @@ MMU::MMU(PPU* ppu, Cartridge* cartridge){
 }
 
 MMU::~MMU(){
-    ;
+    MMU::dump();
 }
 
 uint8_t MMU::ioRead(const uint16_t &address){
@@ -576,4 +576,22 @@ void MMU::write(const uint16_t &address, const uint8_t &value){
     if(address == 0xFFFF){
         MMU::IE = value;
     }
+}
+
+void MMU::dump(){
+    std::ofstream dumpStream;
+
+    dumpStream.open("dump.bin", std::ios::binary | std::ios::out);
+
+    dumpStream.seekp(0, std::ios::beg);
+
+    char arr[0xFFFF];
+
+    for(uint16_t i = 0; i < 0xFFFF; i++){
+        arr[i] = MMU::read(i);
+    }
+
+    dumpStream.write(arr, 0xFFFF);
+    
+    dumpStream.close();
 }

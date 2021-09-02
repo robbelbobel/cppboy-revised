@@ -28,6 +28,7 @@ class MMU{
 
         uint8_t read(const uint16_t &address);
         void write(const uint16_t &address, const uint8_t &value);
+        void dump();
 };
 
 #endif

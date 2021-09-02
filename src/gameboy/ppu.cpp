@@ -94,7 +94,7 @@ void PPU::pixelTransfer(){
         
         uint16_t bgTMAddr;
 
-        if(PPU::bgTMArea == 1){
+        if(PPU::bgTMArea){
             bgTMAddr = 0x1C00;
         }else{
             bgTMAddr = 0x1800;
@@ -102,10 +102,10 @@ void PPU::pixelTransfer(){
 
         uint16_t bgWinTDAddr;
         
-        if(PPU::bgWinTDArea == 1){
-            bgWinTDAddr = 0x800;
-        }else{
+        if(PPU::bgWinTDArea){
             bgWinTDAddr = 0x0;
+        }else{
+            bgWinTDAddr = 0x800;
         }
 
         for(uint8_t i = 0; i < 20; i++){
@@ -113,6 +113,11 @@ void PPU::pixelTransfer(){
 
             uint8_t byte1 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2)];
             uint8_t byte2 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) + 1];
+
+            // uint8_t byte1 = PPU::vRAM[bgWinTDAddr + ((PPU::ly % 8) * 2)];
+            // uint8_t byte2 = PPU::vRAM[bgWinTDAddr + ((PPU::ly % 8) * 2) + 1];
+
+            std::cout << "Ly: " <<  (int) PPU::ly << ", i: " << (int) i << ", index: " << (int) index << ", byte1 addr: " << (int) bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) << ", byte2 addr: " << (int) bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) + 1 << std::endl;
 
             pixelArray[PPU::ly][(i * 8) + 0] = (((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1);
             pixelArray[PPU::ly][(i * 8) + 1] = (((byte2 >> 6) & 0b1) << 1) + ((byte1 >> 6) & 0b1);
