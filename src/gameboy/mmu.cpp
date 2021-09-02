@@ -39,7 +39,6 @@ MMU::MMU(PPU* ppu, Cartridge* cartridge){
     MMU::write(0xFF41, 0x81);   // STAT
     MMU::write(0xFF42, 0x00);   // SCY
     MMU::write(0xFF43, 0x00);   // SCX
-    MMU::write(0xFF44, 0x91);   // LY
     MMU::write(0xFF45, 0x00);   // LYC
     MMU::write(0xFF46, 0xFF);   // DMA
     MMU::write(0xFF47, 0xFC);   // BGP
@@ -97,9 +96,13 @@ uint8_t MMU::ioRead(const uint16_t &address){
             // TAC
             break;
         
-        case 0xFF08:
+        case 0xFF0F:{
             // IF
+            uint8_t byte = 0;
+            byte += MMU::ppu -> vBlankInt;
+            return byte;
             break;
+        }
         
         case 0xFF10:
             // NR10
@@ -165,9 +168,9 @@ uint8_t MMU::ioRead(const uint16_t &address){
             // NR52
             break;
         
-        case 0xFF40:
+        case 0xFF40:{
             // LCDC
-            uint8_t byte;
+            uint8_t byte = 0;
             byte += MMU::ppu -> bgWinEnable;
             byte += MMU::ppu -> objEnable   << 1;
             byte += MMU::ppu -> objSize     << 2;
@@ -178,10 +181,11 @@ uint8_t MMU::ioRead(const uint16_t &address){
             byte += MMU::ppu -> ppuEnable   << 7;
             return byte;
             break;
+        }
         
-        case 0xFF41:
+        case 0xFF41:{
             // STAT
-            uint8_t byte;
+            uint8_t byte = 0;
             byte += MMU::ppu -> mode;
             byte += MMU::ppu -> lycFlag         << 2;
             byte += MMU::ppu -> hBlankIntSrc    << 3;
@@ -190,6 +194,7 @@ uint8_t MMU::ioRead(const uint16_t &address){
             byte += MMU::ppu -> lycIntSrc       << 6;
             return byte;
             break;
+        }
         
         case 0xFF42:
             // SCY
@@ -201,6 +206,7 @@ uint8_t MMU::ioRead(const uint16_t &address){
         
         case 0xFF44:
             // LY
+            return MMU::ppu -> ly;
             break;
         
         case 0xFF45:
@@ -302,8 +308,9 @@ void MMU::ioWrite(const uint16_t &address, const uint8_t &value){
             // TAC
             break;
         
-        case 0xFF08:
+        case 0xFF0F:
             // IF
+            MMU::ppu -> vBlankInt = value & 0b1;
             break;
         
         case 0xFF10:
@@ -543,7 +550,7 @@ uint8_t MMU::read(const uint16_t &address){
 void MMU::write(const uint16_t &address, const uint8_t &value){
     // VRAM
     if(address >= 0x8000 && address < 0xA000){
-        MMU::ppu -> vRAM[address] = value;
+        MMU::ppu -> vRAM[address - 0x8000] = value;
     }
     // Ext. RAM
     if(address >= 0xA000 && address < 0xC000){
@@ -551,7 +558,7 @@ void MMU::write(const uint16_t &address, const uint8_t &value){
     }
     // WRAM
     if(address >= 0xC000 && address < 0xE000){
-        MMU::wRAM[address] = value;
+        MMU::wRAM[address - 0xC000] = value;
     }
     // OAM
     if(address >= 0xFE00 && address < 0xFEA0){

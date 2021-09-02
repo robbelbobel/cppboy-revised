@@ -833,11 +833,17 @@ void CPU::BIT(uint8_t bitNr, uint8_t addr1a, uint8_t addr1b){
 
 // RES Operations
 void CPU::RES(uint8_t bitNr, uint8_t* reg){
-
+    *reg &= ~(0b1 << bitNr);                                                // Reset Bit bitNr Of Register To 0
 }
 
 void CPU::RES(uint8_t bitNr, uint8_t addr1a, uint8_t addr1b){
+    uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
+    
+    uint8_t n = CPU::mmu -> read(addr);                                     // Read Byte From Address
 
+    n &= ~(0b1 << bitNr);                                                   // Reset Bit bitNr Of Byte At Addr To 0
+
+    CPU::mmu -> write(addr, n);                                             // Write Byte Back To Addr
 }
 
 // SET Operations

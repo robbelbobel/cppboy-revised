@@ -1,4 +1,3 @@
-#include <iostream>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
@@ -23,7 +22,7 @@ int main(int argc, char** argv){
     //-----MAIN LOOP-----
     while(window.isOpen()){
         // Get User Input
-        getInput(window);
+        // getInput(window);
 
         // Step The Emulator
         gameboy.step();

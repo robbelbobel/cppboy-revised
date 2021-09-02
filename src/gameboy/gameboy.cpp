@@ -15,6 +15,7 @@ Gameboy::~Gameboy(){
 
 void Gameboy::step(){
     Gameboy::cpu -> step();
+    Gameboy::ppu -> step();
 }
 
 bool Gameboy::loadFile(char* path){

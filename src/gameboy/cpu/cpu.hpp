@@ -35,6 +35,7 @@ class CPU{
 
         // Private Class Functions
         void execute(const uint8_t &instruction);
+        void checkInterrupts();
 
         // Flag Functions
         void setFlag(uint8_t flag);

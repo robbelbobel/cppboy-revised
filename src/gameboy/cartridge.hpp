@@ -2,7 +2,6 @@
 #define CARTRIDGE_HPP
 
 #include <fstream>
-#include <iostream>
 
 class Cartridge{
     private:

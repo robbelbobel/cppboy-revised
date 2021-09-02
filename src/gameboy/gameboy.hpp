@@ -1,8 +1,6 @@
 #ifndef GAMEBOY_HPP
 #define GAMEBOY_HPP
 
-#include <iostream>
-
 #include "mmu.hpp"
 #include "cpu/cpu.hpp"
 
