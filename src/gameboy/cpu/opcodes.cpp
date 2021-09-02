@@ -730,6 +730,8 @@ void CPU::SLA(uint8_t *reg){
 
     CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
     CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+
+    CPU::cycleCount = 8;                                                    // Set Cyclec Count
 }
 
 void CPU::SLA(uint8_t addr1a, uint8_t addr1b){
@@ -755,6 +757,8 @@ void CPU::SLA(uint8_t addr1a, uint8_t addr1b){
     CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
 
     CPU::mmu -> write(addr, n);                                             // Write Byte Back To Addr
+    
+    CPU::cycleCount = 16;                                                   // Set Cycle Count
 }
 
 void CPU::SRA(uint8_t *reg){
@@ -776,6 +780,8 @@ void CPU::SRA(uint8_t *reg){
     CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
 
     *reg |= (CPU::getFlag(FLAG_C) << 7);                                    // Set 7th Bit Equal To Carry Flag
+
+    CPU::cycleCount = 8;                                                    // Set Cycle Count
 }
 
 void CPU::SRA(uint8_t addr1a, uint8_t addr1b){
@@ -803,6 +809,8 @@ void CPU::SRA(uint8_t addr1a, uint8_t addr1b){
     n |= (CPU::getFlag(FLAG_C) << 7);                                       // Set 7th Bit Equal To Carry Flag
 
     CPU::mmu -> write(addr, n);                                             // Write Byte Back To Addr
+
+    CPU::cycleCount = 16;                                                   // Set Cycle Count
 }
 
 void CPU::SRL(uint8_t *reg){
@@ -834,6 +842,8 @@ void CPU::BIT(uint8_t bitNr, uint8_t addr1a, uint8_t addr1b){
 // RES Operations
 void CPU::RES(uint8_t bitNr, uint8_t* reg){
     *reg &= ~(0b1 << bitNr);                                                // Reset Bit bitNr Of Register To 0
+
+    CPU::cycleCount = 8;                                                    // Set Cycle Count
 }
 
 void CPU::RES(uint8_t bitNr, uint8_t addr1a, uint8_t addr1b){
@@ -844,6 +854,8 @@ void CPU::RES(uint8_t bitNr, uint8_t addr1a, uint8_t addr1b){
     n &= ~(0b1 << bitNr);                                                   // Reset Bit bitNr Of Byte At Addr To 0
 
     CPU::mmu -> write(addr, n);                                             // Write Byte Back To Addr
+
+    CPU::cycleCount = 16;                                                   // Set Cycle Count
 }
 
 // SET Operations
