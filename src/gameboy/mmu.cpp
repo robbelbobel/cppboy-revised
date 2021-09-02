@@ -167,10 +167,28 @@ uint8_t MMU::ioRead(const uint16_t &address){
         
         case 0xFF40:
             // LCDC
+            uint8_t byte;
+            byte += MMU::ppu -> bgWinEnable;
+            byte += MMU::ppu -> objEnable   << 1;
+            byte += MMU::ppu -> objSize     << 2;
+            byte += MMU::ppu -> bgTMArea    << 3;
+            byte += MMU::ppu -> bgWinTDArea << 4;
+            byte += MMU::ppu -> winEnable   << 5;
+            byte += MMU::ppu -> winTMArea   << 6;
+            byte += MMU::ppu -> ppuEnable   << 7;
+            return byte;
             break;
         
         case 0xFF41:
             // STAT
+            uint8_t byte;
+            byte += MMU::ppu -> mode;
+            byte += MMU::ppu -> lycFlag         << 2;
+            byte += MMU::ppu -> hBlankIntSrc    << 3;
+            byte += MMU::ppu -> vBlankIntSrc    << 4;
+            byte += MMU::ppu -> oamIntSrc       << 5;
+            byte += MMU::ppu -> lycIntSrc       << 6;
+            return byte;
             break;
         
         case 0xFF42:
@@ -250,7 +268,7 @@ uint8_t MMU::ioRead(const uint16_t &address){
             break;
     }
 
-    // FOR DEV PURPOSES ONLY. SHOULD BE REMOVED
+    // FOR DEV PURPOSES ONLY. SHOULD BE REMOVED AFTER IMPLEMENTING ALL IO READS
     return 0xFF;
 }
 
@@ -374,10 +392,22 @@ void MMU::ioWrite(const uint16_t &address, const uint8_t &value){
         
         case 0xFF40:
             // LCDC
+            MMU::ppu -> bgWinEnable = value & 0b1;
+            MMU::ppu -> objEnable   = (value >> 1) & 0b1;
+            MMU::ppu -> objSize     = (value >> 2) & 0b1;
+            MMU::ppu -> bgTMArea    = (value >> 3) & 0b1;
+            MMU::ppu -> bgWinTDArea = (value >> 4) & 0b1;
+            MMU::ppu -> winEnable   = (value >> 5) & 0b1;
+            MMU::ppu -> winTMArea   = (value >> 6) & 0b1;
+            MMU::ppu -> ppuEnable   = (value >> 7) & 0b1;
             break;
         
         case 0xFF41:
             // STAT
+            MMU::ppu -> hBlankIntSrc    = (value >> 3) & 0b1;
+            MMU::ppu -> vBlankIntSrc    = (value >> 4) & 0b1;
+            MMU::ppu -> oamIntSrc       = (value >> 5) & 0b1;
+            MMU::ppu -> lycIntSrc       = (value >> 6) & 0b1;
             break;
         
         case 0xFF42:
