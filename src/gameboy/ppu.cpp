@@ -27,92 +27,98 @@ void PPU::draw(sf::RenderWindow &window){
     // Set Pixel Size
     pixelShape.setSize(sf::Vector2f(pxSize, pxSize));
     
+    // Draw Pixel Array To Window
     for(unsigned int y = 0; y < 144; y++){
         for(unsigned int x = 0; x < 160; x++){
+            // Calculate Position Of Pixel
             pixelShape.setPosition(sf::Vector2f(x * pxSize, y * pxSize));
+            
+            // Determine Color Of Pixel
             if(PPU::pixelArray[y][x]){
-                pixelShape.setFillColor(sf::Color(0, 0, 0, 255));
+                pixelShape.setFillColor(sf::Color(0, 0, 0));
             }else{
-                pixelShape.setFillColor(sf::Color(255, 255, 255, 255));
+                pixelShape.setFillColor(sf::Color(255, 255, 255));
             }
+
+            // Draw Pixel To Window
             window.draw(pixelShape);
         }
     }
 
+    // Display Pixels
     window.display();
 }
 
 void PPU::hBlank(){
+    // Decrement Cycle Count
     PPU::cycleCount--;
 
     if(PPU::cycleCount == 0){
+        // Increment LY
         PPU::ly++;
 
-        if(PPU::ly >= 145){
-            PPU::mode = PPU_VBLANK;
-        }else{
-            PPU::mode = PPU_OAM_SEARCH;
-        }
+        // Update PPU Mode
+        PPU::mode = PPU::ly >= 145 ? PPU_VBLANK : PPU_OAM_SEARCH;
     }
 }
 
 void PPU::vBlank(){
+    // Enable VBlank Interrupt And Initialize Cycle Count
     if(PPU::cycleCount == 0){
         PPU::vBlankInt  = 1;
         PPU::cycleCount = 4560;
     }
 
+    // Decrement Cycle Count
     PPU::cycleCount--;
 
+    // Update PPU Mode
     if(PPU::cycleCount == 0){
         PPU::ly     = 0;
         PPU::mode   = PPU_OAM_SEARCH;
         return;
     }
     
+    // Update Line Every 456 Cycles
     if(PPU::cycleCount % 456 == 0){
         PPU::ly++;
     }
 }
 
 void PPU::oamSearch(){
+    // Initialize Cycle Count
     if(PPU::cycleCount == 0){
         PPU::cycleCount = 456;
     }
 
+    // Decrement Cycle Count
     PPU::cycleCount--;
 
+    // Update PPU Mode
     if(PPU::cycleCount == 376){
         PPU::mode = PPU_PIXEL_TRANSFER;
     }
 }
 
 void PPU::pixelTransfer(){
+    // Transfer Pixels For Current Line
     if(PPU::cycleCount == 376){
-        PPU::pxPtr = 0;
-        
-        uint16_t bgTMAddr;
+        // Get Background Tile Map Address
+        uint16_t bgTMAddr = PPU::bgTMArea ? 0x1C00 : 0x1800;
 
-        if(PPU::bgTMArea){
-            bgTMAddr = 0x1C00;
-        }else{
-            bgTMAddr = 0x1800;
-        }
+        // Get Background And Window Tile Data Address
+        uint16_t bgWinTDAddr = PPU::bgWinTDArea ? 0x0 : 0x800;
 
-        uint16_t bgWinTDAddr;
-        
-        if(PPU::bgWinTDArea){
-            bgWinTDAddr = 0x0;
-        }else{
-            bgWinTDAddr = 0x800;
-        }
-
+        // Transfer Visible Tiles To Pixel Array
         for(uint8_t i = 0; i < 20; i++){
+            // Calculate Index Of Tile
             uint8_t index = PPU::vRAM[bgTMAddr + i + (32 * (uint8_t)(PPU::ly / 8))];
 
+            // Fetch Bytes From Tile Data
             uint8_t byte1 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2)];
             uint8_t byte2 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) + 1];
 
+            // Store Pixel Color ID In Pixel Array
             pixelArray[PPU::ly][(i * 8) + 0] = (((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1);
             pixelArray[PPU::ly][(i * 8) + 1] = (((byte2 >> 6) & 0b1) << 1) + ((byte1 >> 6) & 0b1);
             pixelArray[PPU::ly][(i * 8) + 2] = (((byte2 >> 5) & 0b1) << 1) + ((byte1 >> 5) & 0b1);
@@ -124,18 +130,22 @@ void PPU::pixelTransfer(){
         }
     }
 
+    // Decrement Pixel Counter
     PPU::cycleCount--;
     
+    // Update PPU Mode
     if(PPU::cycleCount == 208){
         PPU::mode = PPU_HBLANK;
     }
 }
 
 void PPU::step(){
+    // Continue If PPU Is Enabled
     if(!PPU::ppuEnable){
         return;
     }
 
+    // Execute PPU Function
     switch(PPU::mode){
         case PPU_HBLANK:
             PPU::hBlank();

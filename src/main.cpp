@@ -8,7 +8,7 @@ void getInput(sf::Window &window);
 int main(int argc, char** argv){
     //-----INITIALIZATION-----
     // Create SMFL Window
-    sf::RenderWindow window(sf::VideoMode(1000, 500), "cppboy-revised");
+    sf::RenderWindow window(sf::VideoMode(1000, 500), "cppboy-revised", sf::Style::Titlebar);
 
     // Create Instance Of Game Boy Class
     Gameboy gameboy;

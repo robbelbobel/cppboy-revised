@@ -33,7 +33,6 @@ public:
 
     // Public Class Variables
     uint16_t cycleCount;
-    uint8_t pxPtr;
     uint8_t pixelArray[144][160];
     // Memory Arrays
     uint8_t vRAM[0x2000];
