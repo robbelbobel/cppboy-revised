@@ -23,6 +23,9 @@ private:
     void oamSearch();
     void pixelTransfer();
 
+    // Private Class Variables
+    sf::Color pixelColors[4];
+
 public:
     // Public Class Functions
     PPU();
@@ -40,6 +43,8 @@ public:
     // Interrupt
     bool vBlankInt;
     // Registers
+    // BGP
+    uint8_t bgp;
     // LY
     uint8_t ly;
     // LCD Control Register (LCDC)

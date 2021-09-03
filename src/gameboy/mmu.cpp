@@ -219,6 +219,7 @@ uint8_t MMU::ioRead(const uint16_t &address){
         
         case 0xFF47:
             // BGP
+            return MMU::ppu -> bgp;
             break;
         
         case 0xFF48:
@@ -435,6 +436,7 @@ void MMU::ioWrite(const uint16_t &address, const uint8_t &value){
         
         case 0xFF47:
             // BGP
+            MMU::ppu -> bgp = value;
             break;
         
         case 0xFF48:

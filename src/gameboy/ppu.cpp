@@ -3,6 +3,11 @@
 PPU::PPU(){
     // Initialize PPU Variables
     PPU::cycleCount = 0;
+    // Intialize Pixel Colors
+    PPU::pixelColors[0] = sf::Color(255, 255, 255);
+    PPU::pixelColors[1] = sf::Color(211, 211, 211);
+    PPU::pixelColors[2] = sf::Color(169, 169, 169);
+    PPU::pixelColors[3] = sf::Color(0, 0, 0);
     // Initialize Read-Only Registers
     PPU::ly         = 0x91;
     PPU::mode       = 1;
@@ -34,11 +39,7 @@ void PPU::draw(sf::RenderWindow &window){
             pixelShape.setPosition(sf::Vector2f(x * pxSize, y * pxSize));
             
             // Determine Color Of Pixel
-            if(PPU::pixelArray[y][x]){
-                pixelShape.setFillColor(sf::Color(0, 0, 0));
-            }else{
-                pixelShape.setFillColor(sf::Color(255, 255, 255));
-            }
+            pixelShape.setFillColor(PPU::pixelColors[(PPU::bgp >> (PPU::pixelArray[y][x] * 2)) & 0b11]);
 
             // Draw Pixel To Window
             window.draw(pixelShape);
