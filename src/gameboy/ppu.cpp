@@ -5,8 +5,8 @@ PPU::PPU(){
     PPU::cycleCount = 0;
     // Intialize Pixel Colors
     PPU::pixelColors[0] = sf::Color(255, 255, 255);
-    PPU::pixelColors[1] = sf::Color(211, 211, 211);
-    PPU::pixelColors[2] = sf::Color(169, 169, 169);
+    PPU::pixelColors[1] = sf::Color(169,169,169);
+    PPU::pixelColors[2] = sf::Color(128, 128, 128);
     PPU::pixelColors[3] = sf::Color(0, 0, 0);
     // Initialize Read-Only Registers
     PPU::ly         = 0x91;
@@ -90,6 +90,22 @@ void PPU::oamSearch(){
     // Initialize Cycle Count
     if(PPU::cycleCount == 0){
         PPU::cycleCount = 456;
+
+        // Check For Visible Sprites
+        for(uint8_t i = 0; i < 40; i++){
+            // Check Y Visibilty
+            if(PPU::oam[i * 4] <= (!objSize * 7)){
+                PPU::spriteArray[i] = false;
+                continue;
+            }
+
+            // Check X Visibility
+            if(PPU::oam[i * 4 + 1] == 0){
+                PPU::spriteArray[i] = false;
+            }
+
+            PPU::spriteArray[i] = true;
+        }
     }
 
     // Decrement Cycle Count
@@ -104,32 +120,49 @@ void PPU::oamSearch(){
 void PPU::pixelTransfer(){
     // Transfer Pixels For Current Line
     if(PPU::cycleCount == 376){
-        // Get Background Tile Map Address
-        uint16_t bgTMAddr = PPU::bgTMArea ? 0x1C00 : 0x1800;
+        // Transfer Background And Window
+        if(PPU::bgWinEnable){
+            // Get Background Tile Map Address
+            uint16_t bgTMAddr = PPU::bgTMArea ? 0x1C00 : 0x1800;
 
-        // Get Background And Window Tile Data Address
-        uint16_t bgWinTDAddr = PPU::bgWinTDArea ? 0x0 : 0x800;
+            // Get Background And Window Tile Data Address
+            uint16_t bgWinTDAddr = PPU::bgWinTDArea ? 0x0 : 0x800;
 
-        // Transfer Visible Tiles To Pixel Array
-        for(uint8_t i = 0; i < 20; i++){
-            // Calculate Index Of Tile
-            uint8_t index = PPU::vRAM[bgTMAddr + i + (32 * (uint8_t)(PPU::ly / 8))];
+            // Transfer Visible Tiles To Pixel Array
+            for(uint8_t i = 0; i < 20; i++){
+                // Calculate Index Of Tile
+                uint8_t index = PPU::vRAM[bgTMAddr + i + (32 * (uint8_t)(PPU::ly / 8))];
 
-            // Fetch Bytes From Tile Data
-            uint8_t byte1 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2)];
-            uint8_t byte2 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) + 1];
+                // Fetch Bytes From Tile Data
+                uint8_t byte1 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2)];
+                uint8_t byte2 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) + 1];
 
-            // Store Pixel Color ID In Pixel Array
-            pixelArray[PPU::ly][(i * 8) + 0] = (((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1);
-            pixelArray[PPU::ly][(i * 8) + 1] = (((byte2 >> 6) & 0b1) << 1) + ((byte1 >> 6) & 0b1);
-            pixelArray[PPU::ly][(i * 8) + 2] = (((byte2 >> 5) & 0b1) << 1) + ((byte1 >> 5) & 0b1);
-            pixelArray[PPU::ly][(i * 8) + 3] = (((byte2 >> 4) & 0b1) << 1) + ((byte1 >> 4) & 0b1);
-            pixelArray[PPU::ly][(i * 8) + 4] = (((byte2 >> 3) & 0b1) << 1) + ((byte1 >> 3) & 0b1);
-            pixelArray[PPU::ly][(i * 8) + 5] = (((byte2 >> 2) & 0b1) << 1) + ((byte1 >> 2) & 0b1);
-            pixelArray[PPU::ly][(i * 8) + 6] = (((byte2 >> 1) & 0b1) << 1) + ((byte1 >> 1) & 0b1);
-            pixelArray[PPU::ly][(i * 8) + 7] = ((byte2 & 0b1) << 1) + (byte1 & 0b1);
+                // Store Pixel Color ID In Pixel Array
+                PPU::pixelArray[PPU::ly][(i * 8) + 0] = (((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1);
+                PPU::pixelArray[PPU::ly][(i * 8) + 1] = (((byte2 >> 6) & 0b1) << 1) + ((byte1 >> 6) & 0b1);
+                PPU::pixelArray[PPU::ly][(i * 8) + 2] = (((byte2 >> 5) & 0b1) << 1) + ((byte1 >> 5) & 0b1);
+                PPU::pixelArray[PPU::ly][(i * 8) + 3] = (((byte2 >> 4) & 0b1) << 1) + ((byte1 >> 4) & 0b1);
+                PPU::pixelArray[PPU::ly][(i * 8) + 4] = (((byte2 >> 3) & 0b1) << 1) + ((byte1 >> 3) & 0b1);
+                PPU::pixelArray[PPU::ly][(i * 8) + 5] = (((byte2 >> 2) & 0b1) << 1) + ((byte1 >> 2) & 0b1);
+                PPU::pixelArray[PPU::ly][(i * 8) + 6] = (((byte2 >> 1) & 0b1) << 1) + ((byte1 >> 1) & 0b1);
+                PPU::pixelArray[PPU::ly][(i * 8) + 7] = ((byte2 & 0b1) << 1) + (byte1 & 0b1);
+            }
+        }else{
+            // Fill Background With White Pixels
+            for(uint8_t x = 0; x < 160; x++){
+                for(uint8_t y = 0; y < 144; y++){
+                    PPU::pixelArray[y][x] = 0;
+                }
+            }
+        }
+
+        // Transfer Sprites
+        if(PPU::objEnable){
+            
         }
     }
+
+
 
     // Decrement Pixel Counter
     PPU::cycleCount--;

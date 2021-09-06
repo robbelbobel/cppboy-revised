@@ -36,6 +36,7 @@ public:
 
     // Public Class Variables
     uint16_t cycleCount;
+    bool spriteArray[40];
     uint8_t pixelArray[144][160];
     // Memory Arrays
     uint8_t vRAM[0x2000];

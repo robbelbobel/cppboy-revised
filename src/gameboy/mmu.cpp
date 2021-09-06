@@ -432,6 +432,11 @@ void MMU::ioWrite(const uint16_t &address, const uint8_t &value){
         
         case 0xFF46:
             // DMA
+            uint16_t addr = value << 8;
+
+            for(uint8_t i; i < 0xa0; i++){
+                MMU::ppu -> oam[i] = MMU::read(addr + i);
+            }
             break;
         
         case 0xFF47:
