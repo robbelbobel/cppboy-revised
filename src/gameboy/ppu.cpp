@@ -39,7 +39,7 @@ void PPU::draw(sf::RenderWindow &window){
             pixelShape.setPosition(sf::Vector2f(x * pxSize, y * pxSize));
             
             // Determine Color Of Pixel
-            pixelShape.setFillColor(PPU::pixelColors[(PPU::bgp >> (PPU::pixelArray[y][x] * 2)) & 0b11]);
+            pixelShape.setFillColor(PPU::pixelColors[(PPU::bgp >> (PPU::pixelArray[16 + y][8 + x] * 2)) & 0b11]);
 
             // Draw Pixel To Window
             window.draw(pixelShape);
@@ -91,20 +91,10 @@ void PPU::oamSearch(){
     if(PPU::cycleCount == 0){
         PPU::cycleCount = 456;
 
-        // Check For Visible Sprites
+        // Check For Visible Object
         for(uint8_t i = 0; i < 40; i++){
-            // Check Y Visibilty
-            if(PPU::oam[i * 4] <= (!objSize * 7)){
-                PPU::spriteArray[i] = false;
-                continue;
-            }
-
-            // Check X Visibility
-            if(PPU::oam[i * 4 + 1] == 0){
-                PPU::spriteArray[i] = false;
-            }
-
-            PPU::spriteArray[i] = true;
+            // Check If Object Is Present On Current Line
+            PPU::objArray[i] = (PPU::oam[i * 4] - 16) <= PPU::ly && (PPU::oam[i * 4] - 16 + (8 * (1 + PPU::objSize))) > PPU::ly;
         }
     }
 
@@ -138,14 +128,14 @@ void PPU::pixelTransfer(){
                 uint8_t byte2 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) + 1];
 
                 // Store Pixel Color ID In Pixel Array
-                PPU::pixelArray[PPU::ly][(i * 8) + 0] = (((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1);
-                PPU::pixelArray[PPU::ly][(i * 8) + 1] = (((byte2 >> 6) & 0b1) << 1) + ((byte1 >> 6) & 0b1);
-                PPU::pixelArray[PPU::ly][(i * 8) + 2] = (((byte2 >> 5) & 0b1) << 1) + ((byte1 >> 5) & 0b1);
-                PPU::pixelArray[PPU::ly][(i * 8) + 3] = (((byte2 >> 4) & 0b1) << 1) + ((byte1 >> 4) & 0b1);
-                PPU::pixelArray[PPU::ly][(i * 8) + 4] = (((byte2 >> 3) & 0b1) << 1) + ((byte1 >> 3) & 0b1);
-                PPU::pixelArray[PPU::ly][(i * 8) + 5] = (((byte2 >> 2) & 0b1) << 1) + ((byte1 >> 2) & 0b1);
-                PPU::pixelArray[PPU::ly][(i * 8) + 6] = (((byte2 >> 1) & 0b1) << 1) + ((byte1 >> 1) & 0b1);
-                PPU::pixelArray[PPU::ly][(i * 8) + 7] = ((byte2 & 0b1) << 1) + (byte1 & 0b1);
+                PPU::pixelArray[16 + PPU::ly][8 + (i * 8) + 0] = (((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][8 + (i * 8) + 1] = (((byte2 >> 6) & 0b1) << 1) + ((byte1 >> 6) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][8 + (i * 8) + 2] = (((byte2 >> 5) & 0b1) << 1) + ((byte1 >> 5) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][8 + (i * 8) + 3] = (((byte2 >> 4) & 0b1) << 1) + ((byte1 >> 4) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][8 + (i * 8) + 4] = (((byte2 >> 3) & 0b1) << 1) + ((byte1 >> 3) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][8 + (i * 8) + 5] = (((byte2 >> 2) & 0b1) << 1) + ((byte1 >> 2) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][8 + (i * 8) + 6] = (((byte2 >> 1) & 0b1) << 1) + ((byte1 >> 1) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][8 + (i * 8) + 7] = ((byte2 & 0b1) << 1) + (byte1 & 0b1);
             }
         }else{
             // Fill Background With White Pixels
@@ -156,13 +146,17 @@ void PPU::pixelTransfer(){
             }
         }
 
-        // Transfer Sprites
+        // Transfer Objects
         if(PPU::objEnable){
-            
+            // Loop Through Objects
+            for(uint8_t i = 0; i < 40; i++){
+                // Check If Object Is Visible
+                if(PPU::objArray[i]){
+                    // PPU::pixelArray[PPU::ly]
+                }
+            }
         }
     }
-
-
 
     // Decrement Pixel Counter
     PPU::cycleCount--;
