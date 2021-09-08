@@ -151,9 +151,26 @@ void PPU::pixelTransfer(){
             // Loop Through Objects
             for(uint8_t i = 0; i < 40; i++){
                 // Check If Object Is Visible
-                if(PPU::objArray[i]){
-                    // PPU::pixelArray[PPU::ly]
+                if(!PPU::objArray[i]){
+                    continue;
                 }
+
+                // Fetch Object Tile Index
+                uint8_t index = PPU::oam[i * 4 + 2];
+
+                // Fetch Bytes From Tile Data
+                uint8_t byte1 = PPU::vRAM[0x8000 + index * 16 + ((PPU::ly - (PPU::oam[i * 4] - 16)) * 2)];
+                uint8_t byte2 = PPU::vRAM[0x8000 + index * 16 + ((PPU::ly - (PPU::oam[i * 4] - 16)) * 2) + 1];
+
+                // Store Object Pixel Color ID In Pixel Array
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1]] = (((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 1] = (((byte2 >> 6) & 0b1) << 1) + ((byte1 >> 6) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 2] = (((byte2 >> 5) & 0b1) << 1) + ((byte1 >> 5) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 3] = (((byte2 >> 4) & 0b1) << 1) + ((byte1 >> 4) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 4] = (((byte2 >> 3) & 0b1) << 1) + ((byte1 >> 3) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 5] = (((byte2 >> 2) & 0b1) << 1) + ((byte1 >> 2) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 6] = (((byte2 >> 1) & 0b1) << 1) + ((byte1 >> 1) & 0b1);
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 7] = ((byte2 & 0b1) << 1) + (byte1 & 0b1);
             }
         }
     }

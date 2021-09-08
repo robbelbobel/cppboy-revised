@@ -26,15 +26,12 @@ int main(int argc, char** argv){
     stepClock.restart();
     updateClock.restart();
 
-    uint64_t stepCount = 0;
-
     //-----MAIN LOOP-----
     while(window.isOpen()){
         // Step The Emulator
         if(stepClock.getElapsedTime().asMicroseconds() >= (1000000 / GAMEBOY_SPEED)){
             // Step Emulator
             gameboy.step();
-            stepCount++;
 
             // Restart Clock
             stepClock.restart();
@@ -51,8 +48,6 @@ int main(int argc, char** argv){
             updateClock.restart();
         }
     }
-
-    std::cout << "stepcount: " << stepCount << std::endl;
 
     return 0;
 }

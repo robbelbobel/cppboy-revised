@@ -469,7 +469,7 @@ void MMU::ioWrite(const uint16_t &address, const uint8_t &value){
             uint16_t addr = value << 8;
 
             for(uint8_t i; i < 0xa0; i++){
-                MMU::ppu -> oam[i] = MMU::read(addr + i);
+                MMU::write(0xFE00 + i, MMU::read(addr + i));
             }
 
             break;

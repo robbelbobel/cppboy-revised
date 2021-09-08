@@ -3643,7 +3643,7 @@ void CPU::execute(const uint8_t &instruction){
         }
 
         case 0xEA:{
-            CPU::LD(CPU::H, CPU::L, CPU::A);
+            CPU::LD(CPU::mmu -> read(CPU::PC + 2), CPU::mmu -> read(CPU::PC + 1), CPU::A);
             CPU::PC += 3;
             break;
         }
@@ -3713,7 +3713,7 @@ void CPU::execute(const uint8_t &instruction){
         }
 
         case 0xFA:{
-            CPU::LD(&A, CPU::mmu -> read(CPU::PC + 2), CPU::mmu -> read(CPU::PC + 2));
+            CPU::LD(&A, CPU::mmu -> read(CPU::PC + 2), CPU::mmu -> read(CPU::PC + 1));
             CPU::PC += 3;
             break;
         }
