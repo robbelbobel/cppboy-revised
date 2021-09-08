@@ -37,15 +37,17 @@ public:
     // Public Class Variables
     uint16_t cycleCount;
     bool objArray[40];
-    uint8_t pixelArray[176][176];
+    sf::Color pixelArray[176][176];
     // Memory Arrays
     uint8_t vRAM[0x2000];
     uint8_t oam[0xA0];
     // Interrupt
     bool vBlankInt;
     // Registers
-    // BGP
+    // Pallette Data
     uint8_t bgp;
+    uint8_t obp0;
+    uint8_t obp1;
     // LY
     uint8_t ly;
     // LCD Control Register (LCDC)

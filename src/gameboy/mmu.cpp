@@ -224,10 +224,12 @@ uint8_t MMU::ioRead(const uint16_t &address){
         
         case 0xFF48:
             // OBP0
+            return MMU::ppu -> obp0;
             break;
         
         case 0xFF49:
             // OBP1
+            return MMU::ppu -> obp1;
             break;
         
         case 0xFF4A:
@@ -483,11 +485,13 @@ void MMU::ioWrite(const uint16_t &address, const uint8_t &value){
         
         case 0xFF48:{
             // OBP0
+            MMU::ppu -> obp0 = value;
             break;
         }
         
         case 0xFF49:{
             // OBP1
+            MMU::ppu -> obp1 = value;
             break;
         }
         
