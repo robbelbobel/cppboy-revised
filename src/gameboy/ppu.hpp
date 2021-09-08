@@ -6,6 +6,8 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
+#include <iostream>
+
 enum PPU_MODES{
     PPU_HBLANK,
     PPU_VBLANK,

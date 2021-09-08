@@ -159,8 +159,8 @@ void PPU::pixelTransfer(){
                 uint8_t index = PPU::oam[i * 4 + 2];
 
                 // Fetch Bytes From Tile Data
-                uint8_t byte1 = PPU::vRAM[0x8000 + index * 16 + ((PPU::ly - (PPU::oam[i * 4] - 16)) * 2)];
-                uint8_t byte2 = PPU::vRAM[0x8000 + index * 16 + ((PPU::ly - (PPU::oam[i * 4] - 16)) * 2) + 1];
+                uint8_t byte1 = PPU::vRAM[index * 16 + ((PPU::ly - (PPU::oam[i * 4] - 16)) * 2)];
+                uint8_t byte2 = PPU::vRAM[index * 16 + ((PPU::ly - (PPU::oam[i * 4] - 16)) * 2) + 1];
 
                 // Store Object Pixel Color ID In Pixel Array
                 PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1]] = (((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1);
