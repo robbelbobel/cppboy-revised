@@ -1,9 +1,10 @@
 #include "mmu.hpp"
 
-MMU::MMU(PPU* ppu, Cartridge* cartridge){
+MMU::MMU(PPU* ppu, Cartridge* cartridge, InputHandler* inputHandler){
     // Assign Private Class Pointers
-    MMU::ppu        = ppu;
-    MMU::cartridge  = cartridge;
+    MMU::ppu            = ppu;
+    MMU::cartridge      = cartridge;
+    MMU::inputHandler   = inputHandler;
 
     // Initialize IO Registers
     MMU::write(0xFF00, 0xCF);   // JOYP
@@ -64,12 +65,15 @@ MMU::MMU(PPU* ppu, Cartridge* cartridge){
 
 MMU::~MMU(){
     MMU::dump();
+    std::cout << "Dumped" << std::endl;
 }
 
 uint8_t MMU::ioRead(const uint16_t &address){
     switch(address){
         case 0xFF00:
             // JOYP
+            MMU::inputHandler -> update();
+            return MMU::inputHandler -> joyp;
             break;
         
         case 0xFF01:
@@ -82,14 +86,17 @@ uint8_t MMU::ioRead(const uint16_t &address){
 
         case 0xFF04:
             // DIV
+            std::cout << "DIV Read" << std::endl;
             break;
         
         case 0xFF05:
             // TIMA
+            std::cout << "TIMA Read" << std::endl;
             break;
         
         case 0xFF06:
             // TMA
+            std::cout << "TMA Read" << std::endl;
             break;
         
         case 0xFF07:
@@ -285,6 +292,8 @@ void MMU::ioWrite(const uint16_t &address, const uint8_t &value){
     switch(address){
         case 0xFF00:{
             // JOYP
+            MMU::inputHandler -> joyp &= ~(0b11 << 4);
+            MMU::inputHandler -> joyp += (value & (0b11 << 4));
             break;
         }    
         

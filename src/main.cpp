@@ -41,7 +41,7 @@ int main(int argc, char** argv){
             // Get User Input
             getInput(window);
 
-            // Draw Emulator
+            // Update Window
             gameboy.draw(window);
 
             // Restart Clock

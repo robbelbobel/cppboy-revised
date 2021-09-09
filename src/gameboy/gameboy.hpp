@@ -11,6 +11,7 @@ class Gameboy{
         MMU* mmu;
         CPU* cpu;
         PPU* ppu;
+        InputHandler* inputHandler;
 
     public:
         // Public Functions

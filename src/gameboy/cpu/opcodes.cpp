@@ -568,7 +568,7 @@ void CPU::INTCALL(uint8_t a8){
 
     CPU::mmu -> write(CPU::SP, (CPU::PC) & 0xFF);                           // Write Least Significant Byte
     CPU::mmu -> write(CPU::SP + 1, ((CPU::PC) >> 8) & 0xFF);                // Write Most Significant Byte
-
+    
     CPU::PC = a8;                                                           // Set Program Counter To Addr
 
     CPU::cycleCount = 12;                                                   // Set CycleCount

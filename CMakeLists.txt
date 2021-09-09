@@ -12,6 +12,7 @@ add_executable(${PROJECT_NAME}  src/main.cpp
                                 src/gameboy/ppu.cpp
                                 src/gameboy/cpu/cpu.cpp
                                 src/gameboy/cpu/opcodes.cpp
+                                src/gameboy/inputHandler.cpp
                                 )
 
 find_package(SFML REQUIRED system window graphics)

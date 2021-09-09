@@ -3,14 +3,16 @@
 
 #include <stdint.h>
 
-#include "cartridge.hpp"
 #include "ppu.hpp"
+#include "cartridge.hpp"
+#include "inputHandler.hpp"
 
 class MMU{
     private:
         // Private Class Variables
         PPU* ppu;
         Cartridge* cartridge;
+        InputHandler* inputHandler;
         // Memory Arrays
         uint8_t wRAM[0x2000];
         uint8_t hRAM[0x80];
@@ -23,7 +25,7 @@ class MMU{
 
     public:
         // Public Class Functions
-        MMU(PPU* ppu, Cartridge* cartridge);
+        MMU(PPU* ppu, Cartridge* cartridge, InputHandler* inputHandler);
         ~MMU();
 
         uint8_t read(const uint16_t &address);
