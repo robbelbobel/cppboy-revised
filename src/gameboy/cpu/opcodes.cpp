@@ -67,19 +67,17 @@ void CPU::LDH(uint8_t *reg, uint8_t a8){
 // INC Operations
 void CPU::INC(uint8_t *reg){
     CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
 
     if((((((*reg &0xF) + 1) & 0xF0) >> 4) & 0b1) == 0b1){
         CPU::setFlag(FLAG_H);                                               // Set H Flag If A Half Carry Occured
-    }else{
-        CPU::clearFlag(FLAG_H);                                             // Else Clear The H Flag
     }
 
     *reg += 1;                                                              // Increment Reg
 
     if(*reg == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero Flag
     }
 
     CPU::cycleCount = 4;                                                    // Set CycleCount
@@ -95,22 +93,20 @@ void CPU::INC(uint8_t *reg1a, uint8_t *reg1b){
 }
 
 void CPU::INC(uint8_t addr1a, uint8_t addr1b){
-    uint8_t num = CPU::mmu -> read((((uint16_t) addr1a) << 8) + addr1b);    // Read The Byte From Memory
-
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+
+    uint8_t num = CPU::mmu -> read((((uint16_t) addr1a) << 8) + addr1b);    // Read The Byte From Memory
 
     if((((((num &0xF) + 1) & 0xF0) >> 4) & 0b1) == 0b1){
         CPU::setFlag(FLAG_H);                                               // Set H Flag If A Half Carry Occured
-    }else{
-        CPU::clearFlag(FLAG_H);                                             // Else Clear The H Flag
     }
 
     num++;                                                                  // Increment The Byte
     
     if(num == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Flag
     }
 
     CPU::mmu -> write((((uint16_t) addr1a) << 8) + addr1b, num);            // Write Num To Memory
@@ -126,20 +122,18 @@ void CPU::INC(uint16_t* SP){
 
 // DEC Operations
 void CPU::DEC(uint8_t *reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero FLag
     CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear The Half Carry Flag
 
     if((((((*reg &0xF) - 1) & 0xF0) >> 4) & 0b1) == 0b1){
         CPU::setFlag(FLAG_H);                                               // Set H Flag If A Half Carry Occured
-    }else{
-        CPU::clearFlag(FLAG_H);                                             // Else Clear The H Flag
     }
 
     *reg -= 1;                                                              // Decrement Reg
 
     if(*reg == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
-    }else{  
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero FLag
     }
 
     CPU::cycleCount = 4;                                                    // Set CycleCount
@@ -159,20 +153,18 @@ void CPU::DEC(uint8_t *reg1a, uint8_t *reg1b){
 void CPU::DEC(uint8_t addr1a, uint8_t addr1b){
     uint8_t num = CPU::mmu -> read((((uint16_t) addr1a) << 8) + addr1b); // Read The Byte From Memory
 
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
 
-    if((((((num &0xF) - 1) & 0xF0) >> 4) & 0b1) == 0b1){
-        CPU::setFlag(H);                                                    // Set H Flag If A Half Carry Occurs
-    }else{
-        CPU::clearFlag(H);                                                  // Else Clear H Flag
+    if((((((num & 0xF) - 1) & 0xF0) >> 4) & 0b1) == 0b1){
+        CPU::setFlag(FLAG_H);                                               // Set H Flag If A Half Carry Occurs
     }
 
     num--;                                                                  // Decrement Num
 
     if(num == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result is Zero
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero Flag
     }
 
     CPU::mmu -> write((((uint16_t) addr1a) << 8) + addr1b, num);            // Write Num To Address Addr
@@ -189,20 +181,18 @@ void CPU::DEC(uint16_t *SP){
 // ADD Operations
 void CPU::ADD(uint8_t *reg1a, uint8_t *reg1b, uint8_t reg2a, uint8_t reg2b){
     CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
     uint16_t reg1 = (((uint16_t) *reg1a) << 8) + *reg1b;                    // Merge Reg1
     uint16_t reg2 = (((uint16_t) reg2a) << 8) + reg2b;                      // Merge Reg2
 
     if(((((reg1 & 0xFF) + (reg2 & 0xFF)) >> 8) & 0b1) == 0b1){
         CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag If Half Carry Occurs
-    }else{
-        CPU::clearFlag(FLAG_H);                                             // Else Clear Half Carry Flag
     }
 
     if((((((uint32_t) reg1) + reg2) >> 16) & 0b1) == 0b1){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Carry Occurs
-    }else{
-        CPU::clearFlag(FLAG_C);                                             // Else Clear Carry Flag
     }
 
     reg1 += reg2;                                                           // Add Reg2 To Reg1
@@ -214,33 +204,33 @@ void CPU::ADD(uint8_t *reg1a, uint8_t *reg1b, uint8_t reg2a, uint8_t reg2b){
 }
 
 void CPU::ADD(uint8_t *reg, uint8_t d8){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::clearFlag(FLAG_N);                                                 // Substract Clear Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
     if(((((((uint16_t) *reg) &0xF) + d8) >> 4) & 0b1) == 0b1){ 
         CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag If Half Carry Occured
-    }else{
-        CPU::clearFlag(FLAG_H);                                             // Else Clear Half Carry Flag
     }
     
     if((((((uint16_t) *reg) + d8) >> 8) & 0b1) == 0b1){ 
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Carry Occured
-    }else{
-        CPU::clearFlag(FLAG_C);                                             // Else Clear Carry Flag
     }
 
     *reg += d8;                                                             // Add d8 To Reg
 
     if(*reg == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero Flag
     }
 
     CPU::cycleCount = 4;                                                    // Set CycleCount
 }
 
 void CPU::ADD(uint8_t *reg, uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::clearFlag(FLAG_N);                                                 // Clear Substraction Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
     uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
     
@@ -248,43 +238,35 @@ void CPU::ADD(uint8_t *reg, uint8_t addr1a, uint8_t addr1b){
 
     if(((((((uint16_t) *reg) &0xF) + num) >> 4) & 0b1) == 0b1){ 
         CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag If Half Carry Occured
-    }else{
-        CPU::clearFlag(FLAG_H);                                             // Else Clear Half Carry Flag
     }
 
     if((((((uint16_t) *reg) + num) >> 8) & 0b1) == 0b1){ 
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Carry Occured
-    }else{
-        CPU::clearFlag(FLAG_C);                                             // Else Clear Carry Flag
     }
 
     *reg += num;                                                            // Add Num To Reg
 
     if(*reg == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero Flag
     }
 
     CPU::cycleCount = 8;                                                    // Set CycleCount
 }
 
 void CPU::ADD(uint8_t *reg1a, uint8_t *reg1b, uint16_t SP){
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
     uint16_t reg1 = ((uint16_t) *reg1a << 8) + *reg1b;                      // Merge Reg1
 
     if(((((reg1 &0xFF) + SP) >> 8) & 0b1) == 0b1){ 
         CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag If Half Carry Occured
-    }else{
-        CPU::clearFlag(FLAG_H);                                             // Else Clear Half Carry Flag
     }
 
     if((((((uint32_t) reg1) + SP) >> 16) & 0b1) == 0b1){ 
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Carry Occured
-    }else{
-        CPU::clearFlag(FLAG_C);                                             // Else Clear Carry Flag
     }
-
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
 
     uint16_t res = reg1 + SP;                                               // Add SP To Reg1
 
@@ -316,11 +298,51 @@ void CPU::ADD(uint16_t* SP, int8_t s8){
 }
 
 void CPU::ADC(uint8_t reg){
-    
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
+    if((((CPU::A & 0xF) + reg + CPU::getFlag(FLAG_C)) & 0xF0) != 0){
+        CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag If Half Carry Occurred
+    }
+
+    if((((uint16_t) CPU::A + reg + CPU::getFlag(FLAG_C)) & 0xFF00) != 0){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Carry Occurred
+    }
+
+    CPU::A += reg + CPU::getFlag(FLAG_C);                                   // Add Reg + Carry Flag To A Register
+
+    if(CPU::A == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
+    }
+
+    CPU::cycleCount = 4;
 }
 
 void CPU::ADC(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
+    uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
+
+    if((((CPU::A & 0xF) + CPU::mmu -> read(addr) + CPU::getFlag(FLAG_C)) & 0xF0) != 0){
+        CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag If Half Carry Occurred
+    }
+
+    if((((uint16_t) CPU::A + CPU::mmu -> read(addr) + CPU::getFlag(FLAG_C)) & 0xFF00) != 0){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Carry Occurred
+    }
+
+    CPU::A += CPU::mmu -> read(addr) + CPU::getFlag(FLAG_C);                // Add Reg + Carry Flag To A Register
+
+    if(CPU::A == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
+    }
+
+    CPU::cycleCount = 8;
 }
 
 // SUB Operations
@@ -342,155 +364,143 @@ void CPU::SBC(uint8_t addr1a, uint8_t addr1b){
 
 // AND Operations
 void CPU::AND(uint8_t reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract FLag
+    CPU::setFlag(FLAG_H);                                                   // Set Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
     CPU::A &= reg;                                                          // Logic AND A and Reg And Store Result In A
 
     if(CPU::A == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag if Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero Flag
     }
-
-    CPU::setFlag(FLAG_H);                                                   // Set Half Carry Flag
-    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract FLag
 
     CPU::cycleCount = 4;                                                    // Set CycleCount
 }
 
 void CPU::AND(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::setFlag(FLAG_H);                                                   // Set Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
     uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
 
     CPU::A &= CPU::mmu -> read(addr);                                       // Logic AND A And Byte At Addr And Store Result In A
 
     if(CPU::A == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero Flag
     }
-
-    CPU::setFlag(FLAG_H);                                                   // Set Half Carry Flag
-    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
 
     CPU::cycleCount = 8;                                                    // Set CycleCount
 }
 
 // XOR Operations
 void CPU::XOR(uint8_t reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
     CPU::A ^= reg;                                                          // Logic XOR A And Reg And Store The Result In A
 
     if(CPU::A == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero Flag
     }
-
-    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
-    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
 
     CPU::cycleCount = 4;                                                    // Set CycleCount
 }
 
 void CPU::XOR(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
     uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
 
     CPU::A ^= CPU::mmu -> read(addr);                                       // Logic XOR A And Reg And Store The Result In A
 
     if(CPU::A == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero Flag
     }
-
-    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
-    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
 
     CPU::cycleCount = 8;                                                    // Set CycleCount
 }
 
 // OR Operations
 void CPU::OR(uint8_t reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+    
     CPU::A |= reg;                                                          // Logic OR A And Reg And Store The Result In A
 
     if(CPU::A == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero Flag
     }
-
-    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
-    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
 
     CPU::cycleCount = 4;                                                    // Set CycleCount
 }
 
 void CPU::OR(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
     uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
 
     CPU::A |= CPU::mmu -> read(addr);                                       // Logic OR A And Reg And Store The Result In A
 
     if(CPU::A == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Zero Flag
     }
-
-    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
-    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
 
     CPU::cycleCount = 8;                                                    // Set CycleCount
 }
 
 // CP Operations
 void CPU::CP(uint8_t reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flags
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
     
     if((CPU::A - reg) == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Z Flag If Reg Is Equal To A
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Z Flag
     }
 
     if((((CPU::A & 0xF) - (reg & 0xF)) >> 4) != 0b0){
         CPU::setFlag(FLAG_H);                                               // Set H Flag If No Half Carry Ocurred
-    }else{
-        CPU::clearFlag(FLAG_H);                                             // Else Clear H Flag
     }
 
     if(CPU::A < reg){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If A Is Less Than Reg
-    }else{
-        CPU::clearFlag(FLAG_C);                                             // Else Clear Carry Flag
     }
 
     CPU::cycleCount = 4;
 }
 
 void CPU::CP(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
     
     uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
 
     if((CPU::A - CPU::mmu -> read(addr)) == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Z Flag If Byte At Addr Is Equal To A
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Z Flag
     }
 
     if((((CPU::A & 0xF) - (CPU::mmu -> read(addr) & 0xF)) >> 4) != 0b0){
         CPU::setFlag(FLAG_H);                                               // Set H Flag If No Half Carry Ocurred
-    }else{
-        CPU::clearFlag(FLAG_H);                                             // Else Clear H Flag
     }
 
     if(CPU::A < CPU::mmu -> read(addr)){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If A Is Less Than Reg
-    }else{
-        CPU::clearFlag(FLAG_C);                                             // Else Clear Carry Flag
     }
 
     CPU::cycleCount = 8;
@@ -714,6 +724,11 @@ void CPU::PUSH(uint8_t reg1a, uint8_t reg1b){
 
 // Shift Operations
 void CPU::SLA(uint8_t *reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
     if((*reg >> 7) == 0b1){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Bit 7 Is 1
     }else{
@@ -728,33 +743,28 @@ void CPU::SLA(uint8_t *reg){
         CPU::clearFlag(FLAG_Z);                                             // Else Clear Flag
     }
 
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
-    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
-
     CPU::cycleCount = 8;                                                    // Set Cyclec Count
 }
 
 void CPU::SLA(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
     uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
     
     uint8_t n = CPU::mmu -> read(addr);                                     // Read Byte From Address
 
     if((n >> 7) == 0b1){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Bit 7 Is 1
-    }else{
-        CPU::clearFlag(FLAG_C);                                             // Else Clear Carry Flag
     }
 
     n = n << 1;                                                             // Bit Shift n To The Left
 
     if(n == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Flag
     }
-
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
-    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
 
     CPU::mmu -> write(addr, n);                                             // Write Byte Back To Addr
     
@@ -762,22 +772,20 @@ void CPU::SLA(uint8_t addr1a, uint8_t addr1b){
 }
 
 void CPU::SRA(uint8_t *reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
     if((*reg & 0b1) == 0b1){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Bit 0 Is 1
-    }else{
-        CPU::clearFlag(FLAG_C);                                             // Else Clear Carry Flag
     }
 
     *reg = *reg >> 1;                                                       // Bit Shift Reg To The Right
 
     if(*reg == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Flag
     }
-
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
-    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
 
     *reg |= (CPU::getFlag(FLAG_C) << 7);                                    // Set 7th Bit Equal To Carry Flag
 
@@ -785,26 +793,24 @@ void CPU::SRA(uint8_t *reg){
 }
 
 void CPU::SRA(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
     uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
     
     uint8_t n = CPU::mmu -> read(addr);                                     // Read Byte From Address
 
     if((n & 0b1) == 0b1){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Bit 0 Is 1
-    }else{
-        CPU::clearFlag(FLAG_C);                                             // Else Clear Carry Flag
     }
 
     n = n >> 1;                                                             // Bit Shift n To The Right
 
     if(n == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is 0
-    }else{
-        CPU::clearFlag(FLAG_Z);                                             // Else Clear Flag
     }
-
-    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
-    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
 
     n |= (CPU::getFlag(FLAG_C) << 7);                                       // Set 7th Bit Equal To Carry Flag
 
@@ -929,22 +935,22 @@ void CPU::CPL(){
 }
 
 void CPU::SCF(){
-    CPU::setFlag(FLAG_C);
     CPU::clearFlag(FLAG_N);
     CPU::clearFlag(FLAG_H);
+    CPU::setFlag(FLAG_C);
 
     CPU::cycleCount = 4;
 }
 
 void CPU::CCF(){
+    CPU::clearFlag(FLAG_N);
+    CPU::clearFlag(FLAG_H);
+    
     if(CPU::getFlag(FLAG_C)){
         CPU::clearFlag(FLAG_C);
     }else{
         CPU::setFlag(FLAG_C);
     }
-
-    CPU::clearFlag(FLAG_N);
-    CPU::clearFlag(FLAG_H);
 
     CPU::cycleCount = 4;
 }
