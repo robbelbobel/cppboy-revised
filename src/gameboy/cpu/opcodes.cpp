@@ -126,8 +126,8 @@ void CPU::DEC(uint8_t *reg){
     CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
     CPU::clearFlag(FLAG_H);                                                 // Clear The Half Carry Flag
 
-    if((((((*reg &0xF) - 1) & 0xF0) >> 4) & 0b1) == 0b1){
-        CPU::setFlag(FLAG_H);                                               // Set H Flag If A Half Carry Occured
+    if((CPU::A & 0xF) == 0){
+        CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag When Borrowing From Bit 4
     }
 
     *reg -= 1;                                                              // Decrement Reg
@@ -151,14 +151,14 @@ void CPU::DEC(uint8_t *reg1a, uint8_t *reg1b){
 }
 
 void CPU::DEC(uint8_t addr1a, uint8_t addr1b){
-    uint8_t num = CPU::mmu -> read((((uint16_t) addr1a) << 8) + addr1b); // Read The Byte From Memory
+    uint8_t num = CPU::mmu -> read((((uint16_t) addr1a) << 8) + addr1b);    // Read The Byte From Memory
 
     CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
     CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
 
-    if((((((num & 0xF) - 1) & 0xF0) >> 4) & 0b1) == 0b1){
-        CPU::setFlag(FLAG_H);                                               // Set H Flag If A Half Carry Occurs
+    if((num & 0xF) == 0){
+        CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag When Borrowing From Bit 4
     }
 
     num--;                                                                  // Decrement Num
@@ -294,7 +294,7 @@ void CPU::ADD(uint16_t* SP, int8_t s8){
 
     *SP += s8;                                                              // Add s8 To SP
 
-    CPU::cycleCount = 16;
+    CPU::cycleCount = 16;                                                   // Set Cycle Count
 }
 
 void CPU::ADC(uint8_t reg){
@@ -317,7 +317,7 @@ void CPU::ADC(uint8_t reg){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
     }
 
-    CPU::cycleCount = 4;
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::ADC(uint8_t addr1a, uint8_t addr1b){
@@ -342,24 +342,104 @@ void CPU::ADC(uint8_t addr1a, uint8_t addr1b){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
     }
 
-    CPU::cycleCount = 8;
+    CPU::cycleCount = 8;                                                    // Set Cycle Count
 }
 
 // SUB Operations
 void CPU::SUB(uint8_t reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
+    if((CPU::A & 0xF) < (reg & 0xF)){
+        CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag When Borrowing From Bit 4
+    }
+
+    if(CPU::A < reg){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag When Borrowing
+    }
+
+    CPU::A -= reg;                                                          // Substract Reg From A
+
+    if(CPU::A == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
+    }
+
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::SUB(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+
+    uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
     
+    uint8_t num = CPU::mmu -> read(addr);                                   // Fetch Num From Memory
+
+    if((CPU::A & 0xF) < (num & 0xF)){
+        CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag When Borrowing From Bit 4
+    }
+
+    if(CPU::A < num){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag When Borrowing
+    }
+
+    CPU::A -= num;                                                          // Substract Num From A
+
+    if(CPU::A == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
+    }
+
+    CPU::cycleCount = 8;                                                    // Set Cycle Count
 }
 
 void CPU::SBC(uint8_t reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
+    if((CPU::A & 0xF) < ((reg + CPU::getFlag(FLAG_C)) & 0xF)){
+        CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag When Borrowing From Bit 4
+    }
+
+    if(CPU::A < (reg + CPU::getFlag(FLAG_C))){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag When Borrowing
+    }
+
+    CPU::A -= reg + CPU::getFlag(FLAG_C);                                   // Substract Reg + CY From A
+
+    if(CPU::A == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
+    }
 }
 
 void CPU::SBC(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
+    uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
+    
+    uint8_t num = CPU::mmu -> read(addr);                                   // Fetch Num From Memory
+
+    if((CPU::A & 0xF) < ((num + CPU::getFlag(FLAG_C)) & 0xF)){
+        CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag When Borrowing From Bit 4
+    }
+
+    if(CPU::A < (num + CPU::getFlag(FLAG_C))){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag When Borrowing
+    }
+
+    CPU::A -= num + CPU::getFlag(FLAG_C);                                   // Substract Num + CY From A
+
+    if(CPU::A == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
+    }
 }
 
 // AND Operations
