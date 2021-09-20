@@ -126,7 +126,7 @@ void CPU::DEC(uint8_t *reg){
     CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
     CPU::clearFlag(FLAG_H);                                                 // Clear The Half Carry Flag
 
-    if((CPU::A & 0xF) == 0){
+    if((*reg & 0xF) == 0){
         CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag When Borrowing From Bit 4
     }
 
@@ -298,20 +298,22 @@ void CPU::ADD(uint16_t* SP, int8_t s8){
 }
 
 void CPU::ADC(uint8_t reg){
+    uint8_t tempC = CPU::getFlag(FLAG_C);                                   // Store Current C Flag In Variable TempC
+
     CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
     CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
     CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
-    if((((CPU::A & 0xF) + reg + CPU::getFlag(FLAG_C)) & 0xF0) != 0){
+    if((((CPU::A & 0xF) + reg + tempC) & 0xF0) != 0){
         CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag If Half Carry Occurred
     }
 
-    if((((uint16_t) CPU::A + reg + CPU::getFlag(FLAG_C)) & 0xFF00) != 0){
+    if((((uint16_t) CPU::A + reg + tempC) & 0xFF00) != 0){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Carry Occurred
     }
 
-    CPU::A += reg + CPU::getFlag(FLAG_C);                                   // Add Reg + Carry Flag To A Register
+    CPU::A += reg + tempC;                                                  // Add Reg + Carry Flag To A Register
 
     if(CPU::A == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
@@ -321,6 +323,8 @@ void CPU::ADC(uint8_t reg){
 }
 
 void CPU::ADC(uint8_t addr1a, uint8_t addr1b){
+    uint8_t tempC = CPU::getFlag(FLAG_C);                                   // Store Current C Flag In Variable TempC
+
     CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
     CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
@@ -328,15 +332,15 @@ void CPU::ADC(uint8_t addr1a, uint8_t addr1b){
 
     uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
 
-    if((((CPU::A & 0xF) + CPU::mmu -> read(addr) + CPU::getFlag(FLAG_C)) & 0xF0) != 0){
+    if((((CPU::A & 0xF) + CPU::mmu -> read(addr) + tempC) & 0xF0) != 0){
         CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag If Half Carry Occurred
     }
 
-    if((((uint16_t) CPU::A + CPU::mmu -> read(addr) + CPU::getFlag(FLAG_C)) & 0xFF00) != 0){
+    if((((uint16_t) CPU::A + CPU::mmu -> read(addr) + tempC) & 0xFF00) != 0){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag If Carry Occurred
     }
 
-    CPU::A += CPU::mmu -> read(addr) + CPU::getFlag(FLAG_C);                // Add Reg + Carry Flag To A Register
+    CPU::A += CPU::mmu -> read(addr) + tempC;                               // Add Reg + Carry Flag To A Register
 
     if(CPU::A == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
@@ -900,29 +904,113 @@ void CPU::SRA(uint8_t addr1a, uint8_t addr1b){
 }
 
 void CPU::SRL(uint8_t *reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
+    if((*reg & 0b1) == 1){
+        CPU::clearFlag(FLAG_C);                                             // Set Carry Flag If Bit 0 Is Zero
+    }
+
+    *reg = *reg >> 1;                                                       // Bitshift Reg To The Right
+
+    CPU::cycleCount = 8;                                                    // Set Cycle Count
 }
 
 void CPU::SRL(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
+    uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
+    
+    uint8_t n = CPU::mmu -> read(addr);                                     // Read Byte From Address
+
+    if((n & 0b1) == 1){
+        CPU::clearFlag(FLAG_C);                                             // Set Carry Flag If Bit 0 Is Zero
+    }
+
+    n = n >> 1;                                                             // Bitshift Reg To The Right
+
+    CPU::mmu -> write(addr, n);                                             // Write N Back To Addr
+
+    CPU::cycleCount = 16;                                                   // Set Cycle Count
 }
 
 // SWAP Operations
 void CPU::SWAP(uint8_t *reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
+    uint8_t lowerBits = (*reg & 0xF);                                       // Store Lower Bits Of Reg In A Variable
+
+    *reg = *reg >> 4;                                                       // Bitshift Reg To The Right
+
+    *reg += (lowerBits << 4);                                               // Add Lowerbits To Reg
+
+    if(*reg == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
+    }
+
+    CPU::cycleCount = 8;                                                    // Set Cycle Count
 }
 
 void CPU::SWAP(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
+    uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
+    
+    uint8_t n = CPU::mmu -> read(addr);                                     // Read Byte From Address
+
+    uint8_t lowerBits = (n & 0xF);                                          // Store Lower Bits Of Reg In A Variable
+
+    n = n >> 4;                                                             // Bitshift Reg To The Right
+
+    n += (lowerBits << 4);                                                  // Add Lowerbits To Reg
+
+    if(n == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
+    }
+
+    CPU::mmu -> write(addr, n);                                             // Write N Back To Addr
+
+    CPU::cycleCount = 16;                                                   // Set Cycle Count
 }
 
 // BIT Operations
 void CPU::BIT(uint8_t bitNr, uint8_t reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::setFlag(FLAG_H);                                                   // Set Half Carry Flag
 
+    if(((reg >> bitNr) & 0b1) == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Bit With BitNr Is Zero
+    }
+
+    CPU::cycleCount = 8;                                                    // Set Cycle Count
 }
 
 void CPU::BIT(uint8_t bitNr, uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::setFlag(FLAG_H);                                                   // Set Half Carry Flag
 
+    uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
+    
+    uint8_t n = CPU::mmu -> read(addr);                                     // Read Byte From Address
+
+    if(((n >> bitNr) & 0b1) == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Bit With BitNr Is Zero
+    }
+
+    CPU::cycleCount = 16;                                                    // Set Cycle Count
 }
 
 // RES Operations
@@ -954,20 +1042,120 @@ void CPU::SET(uint8_t bitNr, uint8_t addr1a, uint8_t addr1b){
 }
 
 // Rotate Operations
-void CPU::RLC(uint8_t *reg){
+void CPU::RLCA(){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+    
+    if((CPU::A >> 7) == 1){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag If 7th Bit Is 1
+    }
 
+    CPU::A = CPU::A << 1;                                                   // Bitshift Reg To The Left
+    CPU::A += CPU::getFlag(FLAG_C);                                         // Set Bit 0 Equal To Carry Flag
+
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
+}
+
+void CPU::RLC(uint8_t *reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+    
+    if((*reg >> 7) == 1){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag If 7th Bit Is 1
+    }
+
+    *reg = *reg << 1;                                                       // Bitshift Reg To The Left
+    *reg += CPU::getFlag(FLAG_C);                                           // Set Bit 0 Equal To Carry Flag
+
+    if(*reg == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
+    }
+
+    CPU::cycleCount = 8;                                                    // Set Cycle Count
 }
 
 void CPU::RLC(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+    
+    uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
+    
+    uint8_t n = CPU::mmu -> read(addr);                                     // Read Byte From Address
 
+    if((n >> 7) == 1){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag If 7th Bit Is 1
+    }
+
+    n = n << 1;                                                             // Bitshift Reg To The Left
+    n += CPU::getFlag(FLAG_C);                                              // Set Bit 0 Equal To Carry Flag
+
+    if(n == 0){
+        CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
+    }
+
+    CPU::mmu -> write(addr, n);                                             // Write N Back To Addr
+
+    CPU::cycleCount = 16;                                                   // Set Cycle Count
+}
+
+void CPU::RRCA(){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+    
+    if((CPU::A & 0b1) == 1){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag If 7th Bit Is 1
+    }
+
+    CPU::A = CPU::A >> 1;                                                   // Bitshift Reg To The Right
+    CPU::A += (CPU::getFlag(FLAG_C) << 7);                                  // Set Bit 7 Equal To Carry Flag
+
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::RRC(uint8_t *reg){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+    
+    if((*reg & 0b1) == 1){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag If 7th Bit Is 1
+    }
 
+    *reg = *reg  >> 1;                                                      // Bitshift Reg To The Right
+    *reg  += (CPU::getFlag(FLAG_C) << 7);                                   // Set Bit 7 Equal To Carry Flag
+
+    CPU::cycleCount = 8;                                                    // Set Cycle Count
 }
 
 void CPU::RRC(uint8_t addr1a, uint8_t addr1b){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
+    
+    uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
+    
+    uint8_t n = CPU::mmu -> read(addr);                                     // Read Byte From Address
 
+    if((n & 0b1) == 1){
+        CPU::setFlag(FLAG_C);                                               // Set Carry Flag If 7th Bit Is 1
+    }
+
+    n = n>> 1;                                                              // Bitshift Reg To The Right
+    n += (CPU::getFlag(FLAG_C) << 7);                                       // Set Bit 7 Equal To Carry Flag
+
+    CPU::mmu -> write(addr, n);                                             // Write N Back To Addr
+
+    CPU::cycleCount = 16;                                                    // Set Cycle Count
 }
 
 void CPU::RL(uint8_t *reg){
@@ -1103,7 +1291,7 @@ void CPU::execute(const uint8_t &instruction){
         }
 
         case 0x07:{
-            CPU::RLC(&A);
+            CPU::RLCA();
             CPU::PC += 1;
             break;
         }

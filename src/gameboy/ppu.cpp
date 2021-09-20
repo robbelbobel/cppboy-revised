@@ -162,23 +162,21 @@ void PPU::pixelTransfer(){
                 uint8_t byte1 = PPU::vRAM[index * 16 + ((PPU::ly - (PPU::oam[i * 4] - 16)) * 2)];
                 uint8_t byte2 = PPU::vRAM[index * 16 + ((PPU::ly - (PPU::oam[i * 4] - 16)) * 2) + 1];
                 
-                uint8_t palette;
+                uint8_t palette = PPU::obp1;
 
                 if(((PPU::oam[(i * 4) + 3] >> 4) & 0b1) == 0){
                     palette = PPU::obp0;
-                }else{
-                    palette = PPU::obp1;
                 }
                 
-                // // Store Object Pixel Color ID In Pixel Array
-                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 0] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1)))) & 0b11];
-                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 1] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 6) & 0b1) << 1) + ((byte1 >> 6) & 0b1)))) & 0b11];
-                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 2] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 5) & 0b1) << 1) + ((byte1 >> 5) & 0b1)))) & 0b11];
-                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 3] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 4) & 0b1) << 1) + ((byte1 >> 4) & 0b1)))) & 0b11];
-                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 4] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 3) & 0b1) << 1) + ((byte1 >> 3) & 0b1)))) & 0b11];
-                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 5] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 2) & 0b1) << 1) + ((byte1 >> 2) & 0b1)))) & 0b11];
-                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 6] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 1) & 0b1) << 1) + ((byte1 >> 1) & 0b1)))) & 0b11];
-                PPU::pixelArray[16 + PPU::ly][PPU::oam[i * 4 + 1] + 7] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 0) & 0b1) << 1) + ((byte1 >> 0) & 0b1)))) & 0b11];
+                // Store Object Pixel Color ID In Pixel Array
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[(i * 4) + 1] + 0] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 7) & 0b1) << 1) + ((byte1 >> 7) & 0b1)))) & 0b11];
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[(i * 4) + 1] + 1] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 6) & 0b1) << 1) + ((byte1 >> 6) & 0b1)))) & 0b11];
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[(i * 4) + 1] + 2] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 5) & 0b1) << 1) + ((byte1 >> 5) & 0b1)))) & 0b11];
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[(i * 4) + 1] + 3] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 4) & 0b1) << 1) + ((byte1 >> 4) & 0b1)))) & 0b11];
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[(i * 4) + 1] + 4] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 3) & 0b1) << 1) + ((byte1 >> 3) & 0b1)))) & 0b11];
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[(i * 4) + 1] + 5] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 2) & 0b1) << 1) + ((byte1 >> 2) & 0b1)))) & 0b11];
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[(i * 4) + 1] + 6] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 1) & 0b1) << 1) + ((byte1 >> 1) & 0b1)))) & 0b11];
+                PPU::pixelArray[16 + PPU::ly][PPU::oam[(i * 4) + 1] + 7] = PPU::pixelColors[(palette >> (2 * ((((byte2 >> 0) & 0b1) << 1) + ((byte1 >> 0) & 0b1)))) & 0b11];
             }
         }
     }

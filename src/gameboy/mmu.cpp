@@ -65,7 +65,6 @@ MMU::MMU(PPU* ppu, Cartridge* cartridge, InputHandler* inputHandler){
 
 MMU::~MMU(){
     MMU::dump();
-    std::cout << "Dumped" << std::endl;
 }
 
 uint8_t MMU::ioRead(const uint16_t &address){
@@ -86,17 +85,14 @@ uint8_t MMU::ioRead(const uint16_t &address){
 
         case 0xFF04:
             // DIV
-            std::cout << "DIV Read" << std::endl;
             break;
         
         case 0xFF05:
             // TIMA
-            std::cout << "TIMA Read" << std::endl;
             break;
         
         case 0xFF06:
             // TMA
-            std::cout << "TMA Read" << std::endl;
             break;
         
         case 0xFF07:
@@ -660,13 +656,13 @@ void MMU::dump(){
 
     dumpStream.seekp(0, std::ios::beg);
 
-    char arr[0xFFFF];
+    char arr[0x10000];
 
-    for(uint16_t i = 0; i < 0xFFFF; i++){
+    for(uint32_t i = 0; i <= 0xFFFF; i++){
         arr[i] = MMU::read(i);
     }
 
-    dumpStream.write(arr, 0xFFFF);
+    dumpStream.write(arr, 0x10000);
     
     dumpStream.close();
 }

@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <SFML/Graphics.hpp>
 
-#include <iostream>
-
 enum keys{
     KEY_RIGHT,
     KEY_LEFT,

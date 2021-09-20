@@ -147,8 +147,10 @@ class CPU{
         void SET(uint8_t bitNr, uint8_t addr1a, uint8_t addr1b);                // Set Bit With BitNr From Byte At Address Addr Equal To 1
 
         // Rotate Operations
+        void RLCA();                                                            // rotate A To Left
         void RLC(uint8_t *reg);                                                 // Rotate Reg To Left
         void RLC(uint8_t addr1a, uint8_t addr1b);                               // Rotate Byte At Address Addr To Left
+        void RRCA();                                                            // Rotate A To Right
         void RRC(uint8_t *reg);                                                 // Rotate Reg To Right
         void RRC(uint8_t addr1a, uint8_t addr1b);                               // Rotate Byte At address Addr To Left    
         void RL(uint8_t *reg);                                                  // Rotate Reg To Left
