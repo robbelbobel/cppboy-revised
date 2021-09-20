@@ -1,7 +1,7 @@
 #include "gameboy/gameboy.hpp"
 
 #define GAMEBOY_SPEED 4194304
-#define UPDATE_SPEED 60
+#define DRAW_SPEED 60
 
 void getInput(sf::Window &window);
 
@@ -22,7 +22,6 @@ int main(int argc, char** argv){
     // SFML Clocks For Timing
     sf::Clock stepClock;
     sf::Clock updateClock;
-    sf::Clock timeClock;
     stepClock.restart();
     updateClock.restart();
 
@@ -37,7 +36,7 @@ int main(int argc, char** argv){
             stepClock.restart();
         }
 
-        if(updateClock.getElapsedTime().asMilliseconds() >= (1000 / UPDATE_SPEED)){
+        if(updateClock.getElapsedTime().asMilliseconds() >= (1000 / DRAW_SPEED)){
             // Get User Input
             getInput(window);
 

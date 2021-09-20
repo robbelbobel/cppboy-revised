@@ -61,9 +61,13 @@ void CPU::reset(){
 }
 
 void CPU::step(){
+    // Fetch Interrupt If IME Is Set
     if(CPU::IME){
         CPU::checkInterrupts();
     }
+
+    // Update Timer Registers
+    CPU::mmu -> updateTimers();
 
     // Execute Instruction If Cycle Count Is 0
     if(CPU::cycleCount == 0){

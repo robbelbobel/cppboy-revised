@@ -20,6 +20,7 @@ class Gameboy{
     
         void step();
         void draw(sf::RenderWindow &window);
+
         bool loadFile(char* path);
 };
 

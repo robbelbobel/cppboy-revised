@@ -85,18 +85,22 @@ uint8_t MMU::ioRead(const uint16_t &address){
 
         case 0xFF04:
             // DIV
+            return MMU::div;
             break;
         
         case 0xFF05:
             // TIMA
+            return MMU::tima;
             break;
         
         case 0xFF06:
             // TMA
+            return MMU::tma;
             break;
         
         case 0xFF07:
             // TAC
+            return MMU::tac;
             break;
         
         case 0xFF0F:{
@@ -305,21 +309,25 @@ void MMU::ioWrite(const uint16_t &address, const uint8_t &value){
 
         case 0xFF04:{
             // DIV
+            MMU::div = 0x00;
             break;
         }
         
         case 0xFF05:{
             // TIMA
+            MMU::tima = value;
             break;
         }
         
         case 0xFF06:{
             // TMA
+            MMU::tma = value;
             break;
         }
         
         case 0xFF07:{
             // TAC
+            MMU::tac = value;
             break;
         }
         
@@ -612,7 +620,7 @@ uint8_t MMU::read(const uint16_t &address){
     }
     // IE
     if(address == 0xFFFF){
-        return MMU::IE;
+        return MMU::ie;
     }
 
     return 0xFF;
@@ -645,7 +653,61 @@ void MMU::write(const uint16_t &address, const uint8_t &value){
     }
     // IE
     if(address == 0xFFFF){
-        MMU::IE = value;
+        MMU::ie = value;
+    }
+}
+
+void MMU::updateTimers(){
+    // Increment DIV Register After 256 Steps
+    if(MMU::divCounter == 256){
+        MMU::div++;
+        MMU::divCounter = 0;
+    }
+
+    // Increment divCounter
+    MMU::divCounter++;
+
+    // Increment TIMA If Timer Enable Is Set
+    if((MMU::tac & 0b100) >> 2 != 1){
+        return;
+    }
+
+    // Fetch Incrementation Speed
+    uint16_t timerSpeed;
+
+    switch(MMU::tac & 0b11){
+        case 0x00:
+            timerSpeed = 1024;
+            break;
+        
+        case 0x01:
+            timerSpeed = 16;
+            break;
+        
+        case 0x10:  
+            timerSpeed = 64;
+            break;
+        
+        case 0x11:
+            timerSpeed = 256;
+            break;
+        
+        default:
+            timerSpeed = 1024;
+    }
+
+    if(MMU::timaCounter == timerSpeed){
+        MMU::tima++;
+        MMU::timaCounter = 0;
+    }
+
+    // Increment TIMA Counter
+    MMU::timaCounter++;
+    
+    // Check For TIMA Overflow
+    if(MMU::tima == 0){
+        MMU::tima = MMU::tma;
+        // Trigger Interrupt Here
     }
 }
 
