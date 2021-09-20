@@ -1034,11 +1034,21 @@ void CPU::RES(uint8_t bitNr, uint8_t addr1a, uint8_t addr1b){
 
 // SET Operations
 void CPU::SET(uint8_t bitNr, uint8_t* reg){
+    *reg |= 0b1 << bitNr;                                                   // Set Bit With BitNr Of Reg
 
+    CPU::cycleCount = 8;                                                    // Set Cycle Count
 }
 
 void CPU::SET(uint8_t bitNr, uint8_t addr1a, uint8_t addr1b){
+    uint16_t addr = ((uint16_t) addr1a << 8) + addr1b;                      // Merge Addr
+    
+    uint8_t n = CPU::mmu -> read(addr);                                     // Read Byte From Address
 
+    n |= 0b1 << bitNr;                                                      // Set Bit With BitNr Of N
+
+    CPU::mmu -> write(addr, n);                                             // Write N Back To Addr
+
+    CPU::cycleCount = 16;                                                   // Set Cycle Count
 }
 
 // Rotate Operations
