@@ -1,6 +1,5 @@
 # TODO
 
-- Fix Sprite Transparency
 - Implement Window Resizing And Fix Scaling
 - Implement Background Scrolling (SCX & SCY)
 - Implement Window Rendering
@@ -11,5 +10,7 @@
 - Implement STOP & HALT
 - Implement ROM Banks
 - Implement Saving
+- Implement Controller Support
+- Implement GUI
 
 And Much More...

@@ -205,10 +205,12 @@ uint8_t MMU::ioRead(const uint16_t &address){
         
         case 0xFF42:
             // SCY
+            return MMU::ppu -> scy;
             break;
         
         case 0xFF43:
             // SCX
+            return MMU::ppu -> scx;
             break;
         
         case 0xFF44:
@@ -218,6 +220,7 @@ uint8_t MMU::ioRead(const uint16_t &address){
         
         case 0xFF45:
             // LYC
+            return MMU::ppu -> lyc;
             break;
         
         case 0xFF46:
@@ -241,10 +244,12 @@ uint8_t MMU::ioRead(const uint16_t &address){
         
         case 0xFF4A:
             // WY
+            return MMU::ppu -> wy;
             break;
         
         case 0xFF4B:
             // WX
+            return MMU::ppu -> wx;
             break;
         
         case 0xFF4D:
@@ -466,16 +471,19 @@ void MMU::ioWrite(const uint16_t &address, const uint8_t &value){
         
         case 0xFF42:{
             // SCY
+            MMU::ppu -> scy = value;
             break;
         }
         
         case 0xFF43:{
             // SCX
+            MMU::ppu -> scx = value;
             break;
         }
         
         case 0xFF45:{
             // LYC
+            MMU::ppu -> lyc = value;
             break;
         }
         
@@ -510,11 +518,13 @@ void MMU::ioWrite(const uint16_t &address, const uint8_t &value){
         
         case 0xFF4A:{
             // WY
+            MMU::ppu -> wy = value;
             break;
         }
         
         case 0xFF4B:{
             // WX
+            MMU::ppu -> wx = value;
             break;
         }
         

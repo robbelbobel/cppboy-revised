@@ -401,20 +401,22 @@ void CPU::SUB(uint8_t addr1a, uint8_t addr1b){
 }
 
 void CPU::SBC(uint8_t reg){
+    uint8_t tempC = CPU::getFlag(FLAG_C);                                   // Store Current C Flag In Variable TempC
+
     CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
     CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
     CPU::clearFlag(FLAG_C);                                                 // Clear Carry Flag
 
-    if((CPU::A & 0xF) < ((reg + CPU::getFlag(FLAG_C)) & 0xF)){
+    if((CPU::A & 0xF) < ((reg + tempC) & 0xF)){
         CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag When Borrowing From Bit 4
     }
 
-    if(CPU::A < (reg + CPU::getFlag(FLAG_C))){
+    if(CPU::A < (reg + tempC)){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag When Borrowing
     }
 
-    CPU::A -= reg + CPU::getFlag(FLAG_C);                                   // Substract Reg + CY From A
+    CPU::A -= reg + tempC;                                                  // Substract Reg + CY From A
 
     if(CPU::A == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
@@ -422,6 +424,8 @@ void CPU::SBC(uint8_t reg){
 }
 
 void CPU::SBC(uint8_t addr1a, uint8_t addr1b){
+    uint8_t tempC = CPU::getFlag(FLAG_C);                                   // Store Current C Flag In Variable TempC
+
     CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
     CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
@@ -431,15 +435,15 @@ void CPU::SBC(uint8_t addr1a, uint8_t addr1b){
     
     uint8_t num = CPU::mmu -> read(addr);                                   // Fetch Num From Memory
 
-    if((CPU::A & 0xF) < ((num + CPU::getFlag(FLAG_C)) & 0xF)){
+    if((CPU::A & 0xF) < ((num + tempC) & 0xF)){
         CPU::setFlag(FLAG_H);                                               // Set Half Carry Flag When Borrowing From Bit 4
     }
 
-    if(CPU::A < (num + CPU::getFlag(FLAG_C))){
+    if(CPU::A < (num + tempC)){
         CPU::setFlag(FLAG_C);                                               // Set Carry Flag When Borrowing
     }
 
-    CPU::A -= num + CPU::getFlag(FLAG_C);                                   // Substract Num + CY From A
+    CPU::A -= num + tempC;                                                  // Substract Num + CY From A
 
     if(CPU::A == 0){
         CPU::setFlag(FLAG_Z);                                               // Set Zero Flag If Result Is Zero
@@ -1165,7 +1169,7 @@ void CPU::RRC(uint8_t addr1a, uint8_t addr1b){
 
     CPU::mmu -> write(addr, n);                                             // Write N Back To Addr
 
-    CPU::cycleCount = 16;                                                    // Set Cycle Count
+    CPU::cycleCount = 16;                                                   // Set Cycle Count
 }
 
 void CPU::RL(uint8_t *reg){
@@ -1186,74 +1190,75 @@ void CPU::RR(uint8_t addr1a, uint8_t addr1b){
 
 // Misc. Operations
 void CPU::NOP(){
-    CPU::cycleCount = 4;    
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::STOP(){
     // CPU::stopMode = true;
-    CPU::cycleCount = 4;
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::HALT(){
     // CPU::haltMode = true;
-    CPU::cycleCount = 4;
-}
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
+}   
 
 void CPU::DAA(){
-
 }
 
 void CPU::CPL(){
-    CPU::setFlag(FLAG_N);
-    CPU::setFlag(FLAG_H);
+    CPU::setFlag(FLAG_N);                                                   // Set Substract Flag
+    CPU::setFlag(FLAG_H);                                                   // Set Half Carry Flag
 
-    CPU::A = ~CPU::A;
+    CPU::A = ~CPU::A;                                                       // Take Complement Of A Register
 
-    CPU::cycleCount = 4;
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::SCF(){
-    CPU::clearFlag(FLAG_N);
-    CPU::clearFlag(FLAG_H);
-    CPU::setFlag(FLAG_C);
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+    CPU::setFlag(FLAG_C);                                                   // Set Carry Flag
 
-    CPU::cycleCount = 4;
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::CCF(){
-    CPU::clearFlag(FLAG_N);
-    CPU::clearFlag(FLAG_H);
+    CPU::clearFlag(FLAG_N);                                                 // Clear Substract Flag
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
     
-    if(CPU::getFlag(FLAG_C)){
-        CPU::clearFlag(FLAG_C);
+    if(CPU::getFlag(FLAG_C)){                                               // Take Complement Of The Carry Flag
+        CPU::clearFlag(FLAG_C); 
     }else{
         CPU::setFlag(FLAG_C);
     }
 
-    CPU::cycleCount = 4;
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::DI(){
-    CPU::IME = 0;
+    CPU::IME = 0;                                                           // Reset Interrupt Master Enable Register
 
-    CPU::cycleCount = 4;
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::EI(){
-    CPU::IME = 1;
+    CPU::IME = 1;                                                           // Set Interrupt Master Enable Register
 
-    CPU::cycleCount = 4;
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::RST(uint8_t byteNr){
-    CPU::SP -= 2;                                               // Decrement Stack Pointer
+    CPU::SP -= 2;                                                           // Decrement Stack Pointer
 
-    CPU::PC++;                                                  // Increment Program Counter
+    CPU::PC++;                                                              // Increment Program Counter
 
-    CPU::mmu -> write(CPU::SP, CPU::PC & 0xFF);                 // Write Least Significant Byte
-    CPU::mmu -> write(CPU::SP + 1, (CPU::PC >> 8) & 0xFF);      // Write Most Significant Byte
+    CPU::mmu -> write(CPU::SP, CPU::PC & 0xFF);                             // Write Least Significant Byte
+    CPU::mmu -> write(CPU::SP + 1, (CPU::PC >> 8) & 0xFF);                  // Write Most Significant Byte
     
-    CPU::PC = byteNr;                                           // Set Program Counter
+    CPU::PC = byteNr;                                                       // Set Program Counter
+
+    CPU::cycleCount = 16;                                                   // Set Cycle Count
 }
 
 void CPU::execute(const uint8_t &instruction){

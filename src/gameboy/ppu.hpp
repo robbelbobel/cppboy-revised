@@ -2,6 +2,7 @@
 #define PPU_HPP
 
 #include <stdint.h>
+#include <iostream>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -35,19 +36,30 @@ public:
     // Public Class Variables
     uint16_t cycleCount;
     bool objArray[40];
-    sf::Color pixelArray[176][176];
+    // Pixel Layers
+    uint8_t objLayer[176][176];
+    uint8_t bgLayer[256][256];
     // Memory Arrays
     uint8_t vRAM[0x2000];
     uint8_t oam[0xA0];
     // Interrupt
     bool vBlankInt;
+
     // Registers
     // Pallette Data
     uint8_t bgp;
     uint8_t obp0;
     uint8_t obp1;
+    // Background Scroll Registers
+    uint8_t scy;
+    uint8_t scx;
     // LY
     uint8_t ly;
+    // LYC
+    uint8_t lyc;
+    // Window Position Registers
+    uint8_t wy;
+    uint8_t wx;
     // LCD Control Register (LCDC)
     bool ppuEnable;
     bool winTMArea;
