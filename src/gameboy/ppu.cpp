@@ -123,9 +123,9 @@ void PPU::pixelTransfer(){
             uint16_t bgWinTDAddr = PPU::bgWinTDArea ? 0x0 : 0x800;
 
             // Transfer Tiles To Background Layer
-            for(uint8_t i = 0; i < 20; i++){
+            for(uint8_t i = 0; i < 21; i++){
                 // Calculate Index Of Tile
-                uint8_t index = PPU::vRAM[bgTMAddr + i + (32 * (uint8_t)(PPU::ly / 8))];
+                uint8_t index = PPU::vRAM[bgTMAddr + ((uint8_t)(i + PPU::scx) + (32 * (uint8_t)((PPU::ly - PPU::scy) / 8)))];
 
                 // Fetch Bytes From Tile Data
                 uint8_t byte1 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2)];
@@ -133,7 +133,7 @@ void PPU::pixelTransfer(){
 
                 // Store Pixel Color ID In Background Layer
                 for(uint8_t j = 0; j < 8; j++){
-                    PPU::bgLayer[PPU::ly][(uint8_t) (i * 8) + j] = (PPU::bgp >> (((((byte2 >> (7 - j)) & 0b1) << 1) + ((byte1 >> (7 - j)) & 0b1)) * 2)) & 0b11;
+                    PPU::bgLayer[PPU::ly - PPU::scy][(uint8_t) ((i * 8) + j + PPU::scx)] = (PPU::bgp >> (((((byte2 >> (7 - j)) & 0b1) << 1) + ((byte1 >> (7 - j)) & 0b1)) * 2)) & 0b11;
                 }
             }
         }else{
