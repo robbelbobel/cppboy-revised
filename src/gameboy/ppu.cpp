@@ -122,10 +122,6 @@ void PPU::pixelTransfer(){
             // Get Background And Window Tile Data Address
             uint16_t bgWinTDAddr = PPU::bgWinTDArea ? 0x0 : 0x800;
 
-            // Hardset SCX & SCY
-            PPU::scx = 0;
-            PPU::scy = 0;
-
             // Transfer Tiles To Background Layer
             for(uint8_t i = 0; i < 21; i++){
                 // Calculate Index Of Tile
@@ -137,8 +133,8 @@ void PPU::pixelTransfer(){
 
                 // Store Pixel Color ID In Background Layer
                 for(uint8_t j = 0; j < 8; j++){
-                    uint8_t y = (PPU::ly - (PPU::scy % 8));
-                    uint8_t x = ((i * 8) + j - (PPU::scx % 8));
+                    uint8_t y = (PPU::ly - ((PPU::scy + 1) % 8));
+                    uint8_t x = ((i * 8) + j - ((PPU::scx) % 8));
 
                     if((x < 160) && (y < 144)){
                         PPU::bgLayer[y][x] = (PPU::bgp >> (((((byte2 >> (7 - j)) & 0b1) << 1) + ((byte1 >> (7 - j)) & 0b1)) * 2)) & 0b11;
