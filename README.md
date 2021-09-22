@@ -2,9 +2,9 @@
 
 ## Description
 
-CPPBOY is a simple gameboy emulator written in C++ and is based on the depricated cppboy project. This project was started mainly to learn more about the way computers work. I chose the gameboy since it provides a good balance between difficulty and fun. The project is still very much work in progress and any help is welcome.
+CPPBOY is a simple gameboy emulator written in C++ and is based on my depricated CPPBOY project. This project was started mainly to learn more about the way computers work. I chose the gameboy since it provides a good balance between difficulty and fun. The project is still very much work in progress and any help is welcome.
 
-## *Prerequisites
+## Prerequisites
 
 To be able to build the CPPBOY-revised project you should have the following libaries installed:
 
