@@ -25,18 +25,13 @@ void PPU::draw(sf::RenderWindow &window){
     // Create Pixel Shape
     sf::RectangleShape pixelShape;
 
-    // Calculate Pixel Size
-    sf::Vector2u winSize = window.getSize();
-    int pxSize = winSize.y / 144;
+    pixelShape.setSize(sf::Vector2f(1, 1));
 
-    // Set Pixel Size
-    pixelShape.setSize(sf::Vector2f(pxSize, pxSize));
-    
     // Draw Layers To Window
     for(unsigned int y = 0; y < 144; y++){
         for(unsigned int x = 0; x < 160; x++){
             // Calculate Position Of Pixel
-            pixelShape.setPosition(sf::Vector2f(x * pxSize, y * pxSize));
+            pixelShape.setPosition(sf::Vector2f(x, y));
             
             // Determine Color Of Pixel
             if(PPU::objLayer[16 + y][8 + x] != 4){
@@ -133,7 +128,7 @@ void PPU::pixelTransfer(){
 
                 // Store Pixel Color ID In Background Layer
                 for(uint8_t j = 0; j < 8; j++){
-                    uint8_t y = (PPU::ly - ((PPU::scy + 1) % 8));
+                    uint8_t y = (PPU::ly - ((PPU::scy) % 8));
                     uint8_t x = ((i * 8) + j - ((PPU::scx) % 8));
 
                     if((x < 160) && (y < 144)){

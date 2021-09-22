@@ -3,12 +3,20 @@
 #define GAMEBOY_SPEED 4194304
 #define DRAW_SPEED 60
 
-void getInput(sf::Window &window);
+#define DRAW_HEIGHT 144
+#define DRAW_WIDTH 160
+
+void getInput(sf::RenderWindow &window, sf::View &view);
+void updateView(sf::RenderWindow &window, sf::View &view);
 
 int main(int argc, char** argv){
     //-----INITIALIZATION-----
     // Create SMFL Window
-    sf::RenderWindow window(sf::VideoMode(500, 500), "cppboy-revised", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(512, 512), "cppboy-revised", sf::Style::Default);
+
+    // Create SFML View
+    sf::View view(sf::Vector2f(80, 72), sf::Vector2f(160, 144));
+    window.setView(view);
 
     // Create Instance Of Game Boy Class
     Gameboy gameboy;
@@ -38,7 +46,7 @@ int main(int argc, char** argv){
 
         if(updateClock.getElapsedTime().asMilliseconds() >= (1000 / DRAW_SPEED)){
             // Get User Input
-            getInput(window);
+            getInput(window, view);
 
             // Update Window
             gameboy.draw(window);
@@ -51,7 +59,7 @@ int main(int argc, char** argv){
     return 0;
 }
 
-void getInput(sf::Window &window){
+void getInput(sf::RenderWindow &window, sf::View &view){
     sf::Event ev;
 
     while(window.pollEvent(ev)){
@@ -60,10 +68,21 @@ void getInput(sf::Window &window){
                 window.close();
                 break;
 
+            case sf::Event::Resized:
+                updateView(window, view);
+                break;
+
             default:
                 break;
         }
     }
 
     return;
+}
+
+void updateView(sf::RenderWindow &window, sf::View &view){
+    view.setSize(sf::Vector2f((float) window.getSize().x / window.getSize().y * DRAW_HEIGHT, DRAW_HEIGHT));
+
+    // Update Window View
+    window.setView(view);
 }
