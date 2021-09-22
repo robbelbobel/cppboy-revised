@@ -38,7 +38,7 @@ public:
     bool objArray[40];
     // Pixel Layers
     uint8_t objLayer[176][176];
-    uint8_t bgLayer[256][256];
+    uint8_t bgLayer[144][160];
     // Memory Arrays
     uint8_t vRAM[0x2000];
     uint8_t oam[0xA0];

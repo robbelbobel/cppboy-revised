@@ -63,7 +63,7 @@ void PPU::hBlank(){
         PPU::ly++;
 
         // Update PPU Mode
-        PPU::mode = PPU::ly >= 145 ? PPU_VBLANK : PPU_OAM_SEARCH;
+        PPU::mode = PPU::ly >= 144 ? PPU_VBLANK : PPU_OAM_SEARCH;
     }
 }
 
@@ -122,24 +122,33 @@ void PPU::pixelTransfer(){
             // Get Background And Window Tile Data Address
             uint16_t bgWinTDAddr = PPU::bgWinTDArea ? 0x0 : 0x800;
 
+            // Hardset SCX & SCY
+            PPU::scx = 0;
+            PPU::scy = 0;
+
             // Transfer Tiles To Background Layer
             for(uint8_t i = 0; i < 21; i++){
                 // Calculate Index Of Tile
-                uint8_t index = PPU::vRAM[bgTMAddr + ((uint8_t)(i + PPU::scx) + (32 * (uint8_t)((PPU::ly - PPU::scy) / 8)))];
+                uint8_t index = PPU::vRAM[bgTMAddr + (((uint8_t)((i * 8) + PPU::scx)) / 8) + ((uint16_t) 32 * (((uint8_t) (PPU::ly + PPU::scy)) / 8))];
 
                 // Fetch Bytes From Tile Data
-                uint8_t byte1 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2)];
-                uint8_t byte2 = PPU::vRAM[bgWinTDAddr + index * 16 + ((PPU::ly % 8) * 2) + 1];
+                uint8_t byte1 = PPU::vRAM[bgWinTDAddr + index * 16 + ((((uint8_t) (PPU::ly + PPU::scy)) % 8) * 2)];
+                uint8_t byte2 = PPU::vRAM[bgWinTDAddr + index * 16 + ((((uint8_t) (PPU::ly + PPU::scy)) % 8) * 2) + 1];
 
                 // Store Pixel Color ID In Background Layer
                 for(uint8_t j = 0; j < 8; j++){
-                    PPU::bgLayer[PPU::ly - PPU::scy][(uint8_t) ((i * 8) + j + PPU::scx)] = (PPU::bgp >> (((((byte2 >> (7 - j)) & 0b1) << 1) + ((byte1 >> (7 - j)) & 0b1)) * 2)) & 0b11;
+                    uint8_t y = (PPU::ly - (PPU::scy % 8));
+                    uint8_t x = ((i * 8) + j - (PPU::scx % 8));
+
+                    if((x < 160) && (y < 144)){
+                        PPU::bgLayer[y][x] = (PPU::bgp >> (((((byte2 >> (7 - j)) & 0b1) << 1) + ((byte1 >> (7 - j)) & 0b1)) * 2)) & 0b11;
+                    }
                 }
             }
         }else{
             // Fill Background With White Pixels
-            for(uint16_t x = 0; x < 256; x++){
-                for(uint16_t y = 0; y < 256; y++){
+            for(uint16_t y = 0; y < 144; y++){
+                for(uint16_t x = 0; x < 160; x++){
                     PPU::bgLayer[y][x] = 0;
                 }
             }

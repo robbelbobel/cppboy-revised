@@ -1,7 +1,7 @@
 # TODO
 
 - Implement Window Resizing And Fix Scaling
-- Implement Background Scrolling (SCX & SCY)
+- Debug Scroll Registers
 - Implement Window Rendering
 - Implement Remaining Opcodes
 - Implement Remaining Interrupts
