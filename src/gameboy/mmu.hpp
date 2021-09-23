@@ -2,7 +2,6 @@
 #define MMU_HPP
 
 #include <stdint.h>
-#include <iostream>
 
 #include "ppu.hpp"
 #include "cartridge.hpp"

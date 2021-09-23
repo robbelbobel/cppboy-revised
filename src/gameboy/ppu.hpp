@@ -2,7 +2,6 @@
 #define PPU_HPP
 
 #include <stdint.h>
-#include <iostream>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>

@@ -12,11 +12,12 @@ void updateView(sf::RenderWindow &window, sf::View &view);
 int main(int argc, char** argv){
     //-----INITIALIZATION-----
     // Create SMFL Window
-    sf::RenderWindow window(sf::VideoMode(512, 512), "cppboy-revised", sf::Style::Default);
+    sf::RenderWindow window(sf::VideoMode(DRAW_WIDTH * 2, DRAW_HEIGHT * 2), "cppboy-revised", sf::Style::Default);
 
     // Create SFML View
     sf::View view(sf::Vector2f(80, 72), sf::Vector2f(160, 144));
-    window.setView(view);
+    // Initialize View
+    updateView(window, view);
 
     // Create Instance Of Game Boy Class
     Gameboy gameboy;
@@ -81,8 +82,16 @@ void getInput(sf::RenderWindow &window, sf::View &view){
 }
 
 void updateView(sf::RenderWindow &window, sf::View &view){
-    view.setSize(sf::Vector2f((float) window.getSize().x / window.getSize().y * DRAW_HEIGHT, DRAW_HEIGHT));
+    // Calculate Window Aspect Ratio
+    float aspectRatio = (float) window.getSize().x / window.getSize().y;
 
-    // Update Window View
+    // Determine Scaling Dimensions
+    if(aspectRatio <  (float) DRAW_WIDTH / DRAW_HEIGHT){
+        view.setSize(sf::Vector2f(DRAW_WIDTH, (1.0f / aspectRatio) * DRAW_WIDTH));
+    }else{
+        view.setSize(sf::Vector2f(aspectRatio * DRAW_HEIGHT, DRAW_HEIGHT));
+    }
+
+    // Set Window View
     window.setView(view);
 }
