@@ -12,7 +12,7 @@ void updateView(sf::RenderWindow &window, sf::View &view);
 int main(int argc, char** argv){
     //-----INITIALIZATION-----
     // Create SMFL Window
-    sf::RenderWindow window(sf::VideoMode(DRAW_WIDTH * 2, DRAW_HEIGHT * 2), "cppboy-revised", sf::Style::Default);
+    sf::RenderWindow window(sf::VideoMode(DRAW_WIDTH * 4, DRAW_HEIGHT * 4), "", sf::Style::Default);
 
     // Create SFML View
     sf::View view(sf::Vector2f(80, 72), sf::Vector2f(160, 144));
@@ -27,6 +27,9 @@ int main(int argc, char** argv){
         std::cerr << "Couldn't load file at given path! Check your arguments and restart the emulator." << std::endl;
         return -1;
     }
+
+    // Set Window Title To Game Title
+    gameboy.setWindowTitle(window);
 
     // SFML Clocks For Timing
     sf::Clock stepClock;

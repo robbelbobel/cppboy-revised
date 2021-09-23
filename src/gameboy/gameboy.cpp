@@ -26,3 +26,7 @@ void Gameboy::draw(sf::RenderWindow &window){
 bool Gameboy::loadFile(char* path){
     return Gameboy::cartridge -> loadFile(path);
 }
+
+void Gameboy::setWindowTitle(sf::RenderWindow &window){
+    window.setTitle(std::string("CPPBOY: ") + Gameboy::cartridge -> title);
+}

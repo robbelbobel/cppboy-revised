@@ -9,6 +9,7 @@
 - Implement STOP & HALT
 - Implement ROM Banks
 - Implement Saving
+- Implement Save States
 - Implement Controller Support
 - Implement GUI (settings, filters, ...)
 

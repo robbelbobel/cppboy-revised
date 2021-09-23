@@ -610,7 +610,7 @@ uint8_t MMU::read(const uint16_t &address){
     }
     // Ext. RAM
     if(address >= 0xA000 && address < 0xC000){
-        ;
+        return MMU::cartridge -> read(address);
     }
     // WRAM
     if(address >= 0xC000 && address < 0xE000){
@@ -637,13 +637,17 @@ uint8_t MMU::read(const uint16_t &address){
 }
 
 void MMU::write(const uint16_t &address, const uint8_t &value){
+    // Cartridge
+    if(address < 0x8000){
+        MMU::cartridge -> write(address, value);
+    }
     // VRAM
     if(address >= 0x8000 && address < 0xA000){
         MMU::ppu -> vRAM[address - 0x8000] = value;
     }
     // Ext. RAM
     if(address >= 0xA000 && address < 0xC000){
-        ;
+        MMU::cartridge -> write(address, value);
     }
     // WRAM
     if(address >= 0xC000 && address < 0xE000){
@@ -706,6 +710,7 @@ void MMU::updateTimers(){
             timerSpeed = 1024;
     }
 
+    // Increment TIMA
     if(MMU::timaCounter == timerSpeed){
         MMU::tima++;
         MMU::timaCounter = 0;

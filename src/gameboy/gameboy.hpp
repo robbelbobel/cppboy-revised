@@ -22,6 +22,7 @@ class Gameboy{
         void draw(sf::RenderWindow &window);
 
         bool loadFile(char* path);
+        void setWindowTitle(sf::RenderWindow &window);
 };
 
 #endif
