@@ -796,6 +796,8 @@ void CPU::POP(uint8_t* reg1a, uint8_t* reg1b){
     *reg1a = CPU::mmu -> read(CPU::SP + 1);                                 // Load Most Significant Byte
     *reg1b = CPU::mmu -> read(CPU::SP);                                     // Load Less Significant Byte
 
+    CPU::F &= ~0xF;
+
     CPU::SP += 2;                                                           // Increment Stack Pointer
 
     CPU::cycleCount = 12;                                                   // Set CycleCount
@@ -1204,6 +1206,7 @@ void CPU::HALT(){
 }   
 
 void CPU::DAA(){
+    
 }
 
 void CPU::CPL(){
@@ -2467,7 +2470,6 @@ void CPU::execute(const uint8_t &instruction){
 
         case 0xC4:{
             CPU::CALLN(FLAG_Z, CPU::mmu -> read(CPU::PC + 2), CPU::mmu -> read(CPU::PC + 1));
-            CPU::PC += 3;
             break;
         }
 
@@ -3833,7 +3835,6 @@ void CPU::execute(const uint8_t &instruction){
 
         case 0xD4:{
             CPU::CALLN(FLAG_C, CPU::mmu -> read(CPU::PC + 2), CPU::mmu -> read(CPU::PC + 1));
-            CPU::PC += 3;
             break;
         }
 

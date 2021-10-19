@@ -72,7 +72,7 @@ void CPU::step(){
     // Execute Instruction If Cycle Count Is 0
     if(CPU::cycleCount == 0){
         CPU::execute(CPU::mmu -> read(CPU::PC));
-        // std::cout << "PC: " << std::hex << (int) CPU::PC << ", a:" << (int) CPU::A << ", f: " << (int) CPU::F << ", B: " << (int) CPU::B << ", C: " << (int) CPU::C << ", D: " << (int) CPU::D << ", E: " << (int) CPU::E << ", H: " << (int) CPU::H << ", L: " << (int) CPU::L << std::endl;
+        // std::cout << "PC: " << std::hex << (int) CPU::PC << ", A:" << (int) CPU::A << ", F: " << (int) CPU::F << ", B: " << (int) CPU::B << ", C: " << (int) CPU::C << ", D: " << (int) CPU::D << ", E: " << (int) CPU::E << ", H: " << (int) CPU::H << ", L: " << (int) CPU::L << ", opc: " << (int) CPU::mmu -> read(CPU::PC) << " " << (int) CPU::mmu -> read(CPU::PC + 1) << " " << (int) CPU::mmu -> read(CPU::PC + 2) << std::endl;
     }
 
     // Decrement Cycle Count

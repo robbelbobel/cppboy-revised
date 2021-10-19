@@ -1,8 +1,6 @@
 #ifndef CARTRIDGE_HPP
 #define CARTRIDGE_HPP
 
-
-#include <iostream>
 #include <fstream>
 
 class Cartridge{

@@ -113,8 +113,6 @@ uint8_t Cartridge::read(const uint16_t &address){
 }
 
 void Cartridge::write(const uint16_t &address, const uint8_t &value){
-    std::cout << "Cartridge write" << std::endl;
-
     // RAM Enable Register
     if(address < 0x2000){
         Cartridge::ramEnable = value;
@@ -125,7 +123,6 @@ void Cartridge::write(const uint16_t &address, const uint8_t &value){
     if(address >= 0x2000 && address < 0x4000){
         // Mask Only Relevant Bits
         Cartridge::romNumber = ((value & 0b11111) & ((0b1 << (Cartridge::romSize + 1)) - 1));
-        
         return;
     }
 
