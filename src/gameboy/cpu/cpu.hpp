@@ -2,6 +2,7 @@
 #define CPU_HPP
 
 #include <iostream>
+#include <fstream>
 
 #include "../mmu.hpp"
 
@@ -16,6 +17,7 @@ class CPU{
     private:
         // Private Class Variables
         MMU* mmu;
+
         uint8_t cycleCount;
 
         // Registers

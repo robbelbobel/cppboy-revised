@@ -1206,7 +1206,38 @@ void CPU::HALT(){
 }   
 
 void CPU::DAA(){
+    CPU::clearFlag(FLAG_Z);                                                 // Clear Zero Flag
     
+    if(CPU::getFlag(FLAG_N)){                                               // Determine If Previous Calculation Was A Subtraction Or Addition
+        // Substract
+        if(CPU::getFlag(FLAG_H)){
+            CPU::A -= 0x6;                                                  // Subtract 0x6 From A If Half Carry Flag Is Set
+            CPU::clearFlag(FLAG_C);                                         // Clear Carry Flag
+        }
+
+        if(CPU::getFlag(FLAG_C)){
+            CPU::A -= 0x60;                                                 // Substract 0x60 From A If Carry Flag Is Set
+            CPU::clearFlag(FLAG_C);                                         // Clear Carry Flag
+        }
+    }else{
+        // Addition
+        if(CPU::getFlag(FLAG_H) || (CPU::A & 0xF) > 0x9){
+            CPU::A += 0x6;                                                  // Add 0x6 To A If The Half Carry Flag Is Set Or The Lower Nibbles Of A Are Bigger Than 0x9
+            CPU::clearFlag(FLAG_C);                                         // Clear Carry Flag
+        }
+
+        if(CPU::getFlag(FLAG_C) || CPU::A > 0x99){
+            CPU::A += 0x60;                                                 // Add 0x60 To A If The Carry Flag Is Set Or A Is Bigger Than 0x99
+            CPU::setFlag(FLAG_C);                                           // Set C Flag
+        }
+    }
+
+    if(CPU::A == 0) CPU::setFlag(FLAG_Z);                                   // Set Zero Flag If Result Is Zero
+
+    CPU::clearFlag(FLAG_H);                                                 // Clear Half Carry Flag
+
+
+    CPU::cycleCount = 4;                                                    // Set Cycle Count
 }
 
 void CPU::CPL(){
