@@ -216,6 +216,7 @@ uint8_t MMU::ioRead(const uint16_t &address){
         case 0xFF44:
             // LY
             return MMU::ppu -> ly;
+            // return 0x90;
             break;
         
         case 0xFF45:

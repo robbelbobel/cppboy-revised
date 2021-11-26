@@ -45,7 +45,7 @@ void CPU::checkInterrupts(){
 void CPU::reset(){
     // Initialize CPU Flags
     CPU::A = 0x01;
-    CPU::F = 0x00;
+    CPU::F = 0xB0;
     CPU::B = 0xFF;
     CPU::C = 0x13;
     CPU::D = 0x00;
@@ -72,7 +72,7 @@ void CPU::step(){
     // Execute Instruction If Cycle Count Is 0
     if(CPU::cycleCount == 0){
         CPU::execute(CPU::mmu -> read(CPU::PC));
-        std::cout << "PC: " << std::hex << (int) CPU::PC << ", A:" << (int) CPU::A << ", F: " << (int) CPU::F << ", B: " << (int) CPU::B << ", C: " << (int) CPU::C << ", D: " << (int) CPU::D << ", E: " << (int) CPU::E << ", H: " << (int) CPU::H << ", L: " << (int) CPU::L << ", opc: " << (int) CPU::mmu -> read(CPU::PC) << " " << (int) CPU::mmu -> read(CPU::PC + 1) << " " << (int) CPU::mmu -> read(CPU::PC + 2) << std::endl;
+        // std::cout << std::hex << std::setfill('0') << std::uppercase << "A: " << std::setw(2) << (int) CPU::A << " F: " << std::setw(2) << (int) CPU::F << " B: " << std::setw(2) << (int) CPU::B  << " C: " << std::setw(2) << (int) CPU::C << " D: " << std::setw(2) << (int) CPU::D << " E: " << std::setw(2) << (int) CPU::E << " H: " << std::setw(2) << (int) CPU::H << " L: " << std::setw(2) << (int) CPU::L << " SP: " << std::setw(4) << (int) CPU::SP << " PC: 00:" << std::setw(4) << (int) CPU::PC <<  " (" << std::setw(2) << (int) CPU::mmu -> read(CPU::PC) << " " << std::setw(2) << (int) CPU::mmu -> read(CPU::PC + 1) << " " << std::setw(2) << (int) CPU::mmu -> read(CPU::PC + 2) << " " << std::setw(2) << (int) CPU::mmu -> read(CPU::PC + 3) << ')' << std::endl;
     }
 
     // Decrement Cycle Count
